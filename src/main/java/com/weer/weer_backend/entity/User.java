@@ -1,22 +1,21 @@
 package com.weer.weer_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @Entity
-@Table(name = "USER")
+@Table(name = "USER_info")
 public class User extends BaseEntity{
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
     private Long userId;
     private String loginId;
@@ -25,7 +24,6 @@ public class User extends BaseEntity{
     private String role;
     private String email;
     private String tel;
-    private String certificate;
     private String organization;
-
+    private boolean approved;
 }

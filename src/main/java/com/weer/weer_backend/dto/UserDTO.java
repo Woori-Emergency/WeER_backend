@@ -1,5 +1,6 @@
 package com.weer.weer_backend.dto;
 
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +14,8 @@ public class UserDTO {
     private String role;
     private String email;
     private String tel;
+    private String organization;
+    private boolean approved;
     private Date createdAt;
     private Date modifiedAt;
 
