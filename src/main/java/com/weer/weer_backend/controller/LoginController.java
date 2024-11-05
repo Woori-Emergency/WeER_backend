@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -21,32 +23,32 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public void login(@RequestBody UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO, HttpServletRequest request) {
         try {
             UserDTO authenticatedUser = loginService.authenticate(userDTO.getLoginId(), userDTO.getPassword());
             HttpSession session = request.getSession();
             session.setAttribute("user", authenticatedUser);
-            response.sendRedirect("/main");
-        } catch (SecurityException ex) {
-            // ID 또는 비밀번호가 잘못되었을 때
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
-        } catch (IllegalStateException ex) {
-            // 사용자가 승인되지 않았을 때
-            response.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
-        } catch (Exception ex) {
-            // 기타 예외 처리
-            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred.");
+            return ResponseEntity.ok("로그인 성공!"); // 성공 메시지 반환
+        }
+        catch (SecurityException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+        catch (IllegalStateException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("회원가입이 아직 승인되지 않았습니다.");
+        }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
         }
     }
 
     @PostMapping("/signup")
-    public void signup(@RequestBody UserDTO userDTO, HttpServletResponse response) throws IOException {
-        try{
+    public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
+        try {
             loginService.signUp(userDTO);
-            response.sendRedirect("/auth/signup/success");
-        } catch (IllegalArgumentException ex){
-            // ID 중복
-           response.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+            return ResponseEntity.ok("회원가입 성공!"); // 성공 메시지 반환
+        }
+        catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("ID 중복");
         }
     }
 
@@ -64,7 +66,6 @@ public class LoginController {
         return ResponseEntity.ok(exists);
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -74,3 +75,4 @@ public class LoginController {
         return ResponseEntity.ok("Logged out successfully");
     }
 }
+

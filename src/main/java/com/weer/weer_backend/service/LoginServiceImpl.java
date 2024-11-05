@@ -4,11 +4,13 @@ import com.weer.weer_backend.dto.UserDTO;
 import com.weer.weer_backend.entity.User;
 import com.weer.weer_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
@@ -19,7 +21,8 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public UserDTO authenticate(String loginId, String password) throws Exception {
         User user = userRepository.findByLoginId(loginId);
-        if (user == null || passwordEncoder.matches(password, user.getPassword())) {
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new SecurityException("아이디 또는 비밀번호가 틀렸습니다.");
         }
         if (!user.isApproved()) {
@@ -27,7 +30,6 @@ public class LoginServiceImpl implements LoginService {
         }
         return convertToDTO(user);
     }
-
 
     @Override
     public void signUp(UserDTO userDTO) {
@@ -40,7 +42,6 @@ public class LoginServiceImpl implements LoginService {
                 .loginId(userDTO.getLoginId())
                 .name(userDTO.getName())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
-                .role(userDTO.getRole())
                 .email(userDTO.getEmail())
                 .tel(userDTO.getTel())
                 .certificate(userDTO.getCertificate())
