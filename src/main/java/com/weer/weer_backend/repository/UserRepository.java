@@ -8,6 +8,11 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    User findByLoginId(String loginId);
+
+    boolean existsByLoginId(String loginId);
+
+    boolean existsByEmail(String email);
     // 사용자 관련 추가 메서드 정의 가능
     List<User> findByApproved(boolean approved);  // 'approved' 필드로 사용자 조회
     List<User> findByApprovedTrue();
