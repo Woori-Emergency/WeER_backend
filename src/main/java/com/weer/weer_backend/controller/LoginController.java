@@ -36,7 +36,7 @@ public class LoginController {
                 response.sendRedirect("/admin");
             }
             if (Objects.equals(authenticatedUser.getRole(), "Hostpital")){
-                response.sendRedirect("/hospital");
+                response.sendRedirect("/hospital-admin");
             }
         }
         catch (SecurityException ex) {

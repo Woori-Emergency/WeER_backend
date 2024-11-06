@@ -15,6 +15,8 @@ public class SpringSecurityConfig {
         http
                 .csrf().disable() // CSRF 보호 비활성화 (개발용)
                 .authorizeRequests()
+//                .requestMatchers("/hostpital-admin/**").hasRole("Hospital")
+//                .requestMatchers("/user/signup-request/","/user/approve-signup/","/user/list/","/user/update/{id}","/user/delete/").hasRole("Admin")
                 .requestMatchers("/auth/**","/main").permitAll() // 인증 없이 접근 허용
                 .anyRequest().authenticated(); // 그 외의 요청은 인증 필요
         return http.build();
