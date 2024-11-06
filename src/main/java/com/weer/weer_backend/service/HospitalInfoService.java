@@ -2,9 +2,7 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.dto.MapInfoResponseDto;
-import com.weer.weer_backend.entity.AdmissionType;
 import com.weer.weer_backend.entity.Hospital;
-import com.weer.weer_backend.repository.AdmissionTypeRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +15,6 @@ public class HospitalInfoService {
 
   private final MapService mapService;
   private final HospitalRepository hospitalRepository;
-  private final AdmissionTypeRepository admissionTypeRepository;
 
   private static final double EARTH_RADIUS = 6371.0;
 
@@ -27,9 +24,6 @@ public class HospitalInfoService {
     for(Hospital hospital : hospitalList) {
       double distance = getDistance(latitude,longitude,hospital);
       if(distance <= range) {
-        AdmissionType admissionType = admissionTypeRepository
-            .findAdmissionTypeByHospitalId(hospital.getHospitalId())
-            .orElseThrow(IllegalArgumentException::new);
 
         MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
 
@@ -40,8 +34,8 @@ public class HospitalInfoService {
             .distance(distance)
             .roadDistance(mapInfo.getDistance())
             .duration(mapInfo.getDuration())
-            .availableBeds(admissionType.getAvailableBeds())
-            .totalBeds(admissionType.getTotalBeds())
+            .availableBeds(hospital.getEmergencyId().getAvailableErBeds())
+            .totalBeds(hospital.getEmergencyId().getErCapacity())
             .build();
         rangeHospitalList.add(hospitalRangeDto);
       }
