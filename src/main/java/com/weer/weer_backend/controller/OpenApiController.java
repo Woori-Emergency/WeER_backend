@@ -5,14 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.weer.weer_backend.service.EmergencyService;
+import com.weer.weer_backend.service.OpenApiService;
 
 @Slf4j
 @RestController
-public class EmergencyController {
+public class OpenApiController {
 
     @Autowired
-    private EmergencyService emergencyService;
+    private OpenApiService emergencyService;
 
     @GetMapping("/api/emergency")
     public String getEmergencyInfo(
