@@ -10,7 +10,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class EmergencyService {
+public class OpenApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;  // 인코딩되지 않은 원본 서비스 키 사용
     private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";

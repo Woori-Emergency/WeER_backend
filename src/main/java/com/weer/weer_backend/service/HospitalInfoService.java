@@ -1,12 +1,11 @@
 package com.weer.weer_backend.service;
 
-import com.weer.weer_backend.dto.HospitalInfoDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.entity.AdmissionType;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.repository.AdmissionTypeRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
-import com.weer.weer_backend.repository.MedicalDepartmentRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
