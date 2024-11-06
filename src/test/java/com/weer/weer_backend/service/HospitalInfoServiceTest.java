@@ -9,11 +9,9 @@ import static org.mockito.Mockito.when;
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.entity.AdmissionType;
 import com.weer.weer_backend.entity.Hospital;
-import com.weer.weer_backend.repository.AdmissionTypeRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,9 +25,6 @@ class HospitalInfoServiceTest {
 
   @Mock
   private HospitalRepository hospitalRepository;
-
-  @Mock
-  private AdmissionTypeRepository admissionTypeRepository;
 
   @BeforeEach
   public void setup() {
@@ -60,9 +55,6 @@ class HospitalInfoServiceTest {
         .build();
 
     when(hospitalRepository.findAll()).thenReturn(hospitals);
-    when(admissionTypeRepository.findAdmissionTypeByHospitalId(1L)).thenReturn(Optional.of(admissionType1));
-    when(admissionTypeRepository.findAdmissionTypeByHospitalId(2L)).thenReturn(Optional.of(admissionType1));
-
     List<HospitalRangeDto> result = hospitalInfoService.getRangeAllHospital(37.7749, -122.4194, 50);
 
     assertEquals(2, result.size());
@@ -82,8 +74,6 @@ class HospitalInfoServiceTest {
     assertEquals(10, hospitalRangeDto2.getTotalBeds());
 
     verify(hospitalRepository, times(1)).findAll();
-    verify(admissionTypeRepository, times(1)).findAdmissionTypeByHospitalId(1L);
-    verify(admissionTypeRepository, times(1)).findAdmissionTypeByHospitalId(2L);
   }
 
   @Test
