@@ -42,7 +42,7 @@ public class ReservationService {
     // 유저 별 예약 리스트 확인
     // 세션으로 보는 게 나을 수도 있다.
     public List<Reservation> getUserReservation(Long loginid){
-        return reservationRepository.findAllByLoginId(loginid);
+        return reservationRepository.findAllByUserId(loginid);
     }
 
     // 병원 별 예약 리스트

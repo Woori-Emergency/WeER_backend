@@ -2,9 +2,7 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.dto.MapInfoResponseDto;
-import com.weer.weer_backend.entity.AdmissionType;
 import com.weer.weer_backend.entity.Hospital;
-import com.weer.weer_backend.repository.AdmissionTypeRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +15,13 @@ public class HospitalInfoService {
 
   private final MapService mapService;
   private final HospitalRepository hospitalRepository;
-  private final AdmissionTypeRepository admissionTypeRepository;
 
   private static final double EARTH_RADIUS = 6371.0;
 
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
     List<Hospital> hospitalList = hospitalRepository.findAll();
     List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
+<<<<<<< HEAD
 //    for(Hospital hospital : hospitalList) {
 //      double distance = getDistance(latitude,longitude,hospital);
 //      if(distance <= range) {
@@ -47,6 +45,27 @@ public class HospitalInfoService {
 //        rangeHospitalList.add(hospitalRangeDto);
 //      }
 //    }
+=======
+    for(Hospital hospital : hospitalList) {
+      double distance = getDistance(latitude,longitude,hospital);
+      if(distance <= range) {
+
+        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
+
+        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
+            .hospitalName(hospital.getName())
+            .latitude(hospital.getLatitude())
+            .longitude(hospital.getLongitude())
+            .distance(distance)
+            .roadDistance(mapInfo.getDistance())
+            .duration(mapInfo.getDuration())
+            .availableBeds(hospital.getEmergencyId().getAvailableErBeds())
+            .totalBeds(hospital.getEmergencyId().getErCapacity())
+            .build();
+        rangeHospitalList.add(hospitalRangeDto);
+      }
+    }
+>>>>>>> f561c529d65b801f977cc9a0886b27faea918402
     return rangeHospitalList;
   }
   private MapInfoResponseDto getMapInfo(Double latitude, Double longitude, Hospital hospital) {
