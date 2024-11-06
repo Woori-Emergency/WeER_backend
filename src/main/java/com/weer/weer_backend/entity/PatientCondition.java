@@ -33,7 +33,7 @@ public class PatientCondition extends BaseEntity {
     private Integer respiration; // 호흡수
 
     @Enumerated(EnumType.STRING)
-    private Condition condition; // 질병 / 질병 외
+    private Condition conditions; // 질병 / 질병 외
 
     @Enumerated(EnumType.STRING)
     private ConsciousnessLevel consciousnessLevel; // 의식 레벨
