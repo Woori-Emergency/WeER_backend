@@ -26,9 +26,8 @@ public class Reservation extends BaseEntity{
     @Column(name = "USER_ID")
     private Long userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PATIENT_CONDITION_ID")
-    private PatientCondition patientCondition;
+    @Column(name = "PATIENT_CONDITION_ID")
+    private Long patientconditionid;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
