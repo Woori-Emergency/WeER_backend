@@ -1,8 +1,11 @@
 package com.weer.weer_backend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Condition {
     DISEASE("질병"),
-    NONDISEASE("질병 외");
+    NON_DISEASE("질병 외");
 
     private final String condition;
 
@@ -10,7 +13,4 @@ public enum Condition {
         this.condition = condition;
     }
 
-    public String getCondition() {
-        return condition;
-    }
 }

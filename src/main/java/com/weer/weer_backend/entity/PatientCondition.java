@@ -1,9 +1,6 @@
 package com.weer.weer_backend.entity;
 
-import com.weer.weer_backend.enums.AgeGroup;
-import com.weer.weer_backend.enums.Condition;
-import com.weer.weer_backend.enums.ConsciousnessLevel;
-import com.weer.weer_backend.enums.Gender;
+import com.weer.weer_backend.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +19,9 @@ public class PatientCondition extends BaseEntity {
     @Column(name = "PATIENT_CONDITION_ID")
     private Long patientconditionid;
 
+    @Column(name = "USER_ID")
+    private Long userId;
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
     @Enumerated(EnumType.STRING)
@@ -37,4 +37,7 @@ public class PatientCondition extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ConsciousnessLevel consciousnessLevel; // 의식 레벨
+
+    @Enumerated(EnumType.STRING)
+    private TransportStatus transportStatus; // 이송 현황
 }

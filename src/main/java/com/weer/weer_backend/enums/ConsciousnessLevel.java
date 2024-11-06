@@ -1,5 +1,8 @@
 package com.weer.weer_backend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ConsciousnessLevel {
     ALERT("A", "Alert-명료"),
     VERBAL("V", "Verbal-언어반응"),

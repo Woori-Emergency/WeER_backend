@@ -1,7 +1,11 @@
 package com.weer.weer_backend.enums;
 
-//알 수 없음
+
+import lombok.Getter;
+
+@Getter
 public enum Gender {
+    UNKNOWN("알 수 없음"),
     FEMALE("여성"),
     MALE("남성");
 
@@ -9,9 +13,5 @@ public enum Gender {
 
     Gender(String gender) {
         this.gender = gender;
-    }
-
-    public String getStatus() {
-        return gender;
     }
 }
