@@ -25,8 +25,11 @@ public class LoginServiceImpl implements LoginService {
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new SecurityException("아이디 또는 비밀번호가 틀렸습니다.");
         }
-        if (!user.isApproved()) {
+        if (!user.getApproved()) {
             throw new IllegalStateException("회원가입이 아직 승인되지 않았습니다. : " + loginId);
+        }
+        if (user.getApproved() == null){
+            throw new IllegalArgumentException("죄송합니다 반려된 계정입니다.");
         }
         return convertToDTO(user);
     }

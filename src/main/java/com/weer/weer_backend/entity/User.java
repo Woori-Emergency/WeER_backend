@@ -26,13 +26,11 @@ public class User extends BaseEntity{
 
     private String name;
     private String password;
-    private String role;
     private String email;
     private String tel;
     private String certificate;
     private String organization;
-
+    private Boolean approved; // 승인 여부 필드 추가
     @Builder.Default
-    private boolean approved = false; // 승인 여부 필드 추가
-
+    private String role = "User";
 }

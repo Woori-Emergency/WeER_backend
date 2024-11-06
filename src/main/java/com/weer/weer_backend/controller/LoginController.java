@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -28,15 +28,24 @@ public class LoginController {
             UserDTO authenticatedUser = loginService.authenticate(userDTO.getLoginId(), userDTO.getPassword());
             HttpSession session = request.getSession();
             session.setAttribute("user", authenticatedUser);
-            response.sendRedirect("/main");
+            if(Objects.equals(authenticatedUser.getRole(), "Member")){
+                response.sendRedirect("/main");
+            }
+            if (Objects.equals(authenticatedUser.getRole(), "Admin")){
+                response.sendRedirect("/admin");
+            }
+            if (Objects.equals(authenticatedUser.getRole(), "Hostpital")){
+                response.sendRedirect("/hospital-admin");
+            }
         }
         catch (SecurityException ex) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "아이디 또는 비밀번호가 잘못되었습니다.");
         }
         catch (IllegalStateException ex) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "회원가입이 아직 승인되지 않았습니다.");        }
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "회원가입이 아직 승인되지 않았습니다.");
+        }
         catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "예상치 못한 오류가 발생하였습니다.");;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "예상치 못한 오류가 발생하였습니다.");
         }
     }
 
@@ -62,7 +71,6 @@ public class LoginController {
     // 비동기식 ID 중복체크
     @GetMapping("/check-login-id")
     public ResponseEntity<Boolean> checkLoginId(@RequestParam String loginId) {
-        boolean exists = loginService.isLoginIdDuplicate(loginId);
         return ResponseEntity.ok(loginService.isLoginIdDuplicate(loginId));
     }
 
