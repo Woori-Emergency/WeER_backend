@@ -1,6 +1,7 @@
 package com.weer.weer_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -10,8 +11,8 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class EmergencyService {
-
-    private final String SERVICE_KEY = "PAu53vTJ00tnugDJvTjgIynHw7N7rOcUhFwgXXPSC4/Dw1A4/nhbWWtKnHdWM6tte5LRtUhrUAvUiSwREGKGAA==";  // 인코딩되지 않은 원본 서비스 키 사용
+    @Value("${OPENAPI_SERVICE_KEY}")
+    private String SERVICE_KEY;  // 인코딩되지 않은 원본 서비스 키 사용
     private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
 
     @Autowired
