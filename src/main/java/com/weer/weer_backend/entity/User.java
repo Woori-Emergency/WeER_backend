@@ -26,7 +26,7 @@ public class User extends BaseEntity{
 
     private String name;
     private String password;
-    private String role;
+
     private String email;
     private String tel;
     private String certificate;
@@ -34,5 +34,6 @@ public class User extends BaseEntity{
 
     @Builder.Default
     private boolean approved = false; // 승인 여부 필드 추가
-
+    @Builder.Default
+    private String role = "user";
 }

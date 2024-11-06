@@ -2,6 +2,7 @@ package com.weer.weer_backend.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -15,8 +16,8 @@ public class HospitalDTO {
     private String phoneNumber;
     private Double latitude;
     private Double longitude;
-    private Date createdAt;
-    private Date modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     // Getters and Setters
 }

@@ -5,6 +5,7 @@ import com.weer.weer_backend.enums.ReservationStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -15,8 +16,8 @@ public class ReservationDTO {
     private Long userId;
     private PatientCondition patientCondition;
     private ReservationStatus reservationStatus;
-    private Date createdAt;
-    private Date modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     // Getters and Setters
 }

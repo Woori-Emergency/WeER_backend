@@ -11,5 +11,4 @@ import java.util.Optional;
 
 @Repository
 public interface AdmissionTypeRepository extends JpaRepository<AdmissionType, Long> {
-    // 입원 유형 관련 추가 메서드 정의 가능
 }
