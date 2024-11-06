@@ -34,6 +34,5 @@ public class User extends BaseEntity{
     @Builder.Default
     private Boolean approved = false; // 승인 여부 필드 추가
     @Builder.Default
-    private String role = "Member"; // 기본 회원가입 시 Member
-
+    private String role = "User"; // 기본 회원가입 시 Member
 }

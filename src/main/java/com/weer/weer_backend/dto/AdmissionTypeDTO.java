@@ -3,6 +3,7 @@ package com.weer.weer_backend.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -13,8 +14,8 @@ public class AdmissionTypeDTO {
     private String admissionType;
     private Integer availableBeds;
     private Integer totalBeds;
-    private Date createdAt;
-    private Date modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     // Getters and Setters
 }
