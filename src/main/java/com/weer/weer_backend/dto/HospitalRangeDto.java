@@ -10,6 +10,8 @@ public class HospitalRangeDto {
   private Double latitude;
   private Double longitude;
   private Double distance;
+  private Integer roadDistance;
+  private Integer duration;
   private int availableBeds;
   private int totalBeds;
 }
