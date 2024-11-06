@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Slf4j
@@ -46,7 +45,7 @@ public class LoginController {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "회원가입이 아직 승인되지 않았습니다.");
         }
         catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "예상치 못한 오류가 발생하였습니다.");;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "예상치 못한 오류가 발생하였습니다.");
         }
     }
 
@@ -72,7 +71,6 @@ public class LoginController {
     // 비동기식 ID 중복체크
     @GetMapping("/check-login-id")
     public ResponseEntity<Boolean> checkLoginId(@RequestParam String loginId) {
-        boolean exists = loginService.isLoginIdDuplicate(loginId);
         return ResponseEntity.ok(loginService.isLoginIdDuplicate(loginId));
     }
 
