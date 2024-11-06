@@ -21,31 +21,6 @@ public class HospitalInfoService {
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
     List<Hospital> hospitalList = hospitalRepository.findAll();
     List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
-<<<<<<< HEAD
-//    for(Hospital hospital : hospitalList) {
-//      double distance = getDistance(latitude,longitude,hospital);
-//      if(distance <= range) {
-//        AdmissionType admissionType = admissionTypeRepository
-//             //.TODO have to impl Repository method
-//            .findAdmissionTypeByHospitalId(hospital.getHospitalId())
-//            .orElseThrow(IllegalArgumentException::new);
-//
-//        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
-//
-//        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-//            .hospitalName(hospital.getName())
-//            .latitude(hospital.getLatitude())
-//            .longitude(hospital.getLongitude())
-//            .distance(distance)
-//            .roadDistance(mapInfo.getDistance())
-//            .duration(mapInfo.getDuration())
-//            .availableBeds(admissionType.getAvailableBeds())
-//            .totalBeds(admissionType.getTotalBeds())
-//            .build();
-//        rangeHospitalList.add(hospitalRangeDto);
-//      }
-//    }
-=======
     for(Hospital hospital : hospitalList) {
       double distance = getDistance(latitude,longitude,hospital);
       if(distance <= range) {
@@ -53,24 +28,23 @@ public class HospitalInfoService {
         MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
 
         HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-            .hospitalName(hospital.getName())
-            .latitude(hospital.getLatitude())
-            .longitude(hospital.getLongitude())
-            .distance(distance)
-            .roadDistance(mapInfo.getDistance())
-            .duration(mapInfo.getDuration())
-            .availableBeds(hospital.getEmergencyId().getAvailableErBeds())
-            .totalBeds(hospital.getEmergencyId().getErCapacity())
-            .build();
+                .hospitalName(hospital.getName())
+                .latitude(hospital.getLatitude())
+                .longitude(hospital.getLongitude())
+                .distance(distance)
+                .roadDistance(mapInfo.getDistance())
+                .duration(mapInfo.getDuration())
+                .availableBeds(hospital.getEmergencyId().getAvailableErBeds())
+                .totalBeds(hospital.getEmergencyId().getErCapacity())
+                .build();
         rangeHospitalList.add(hospitalRangeDto);
       }
     }
->>>>>>> f561c529d65b801f977cc9a0886b27faea918402
     return rangeHospitalList;
   }
   private MapInfoResponseDto getMapInfo(Double latitude, Double longitude, Hospital hospital) {
     return mapService.getMapInfo(latitude,longitude, hospital.getLatitude()
-    , hospital.getLongitude());
+            , hospital.getLongitude());
   }
 
   private Double getDistance(Double latitude, Double longitude, Hospital hospital) {
@@ -83,8 +57,8 @@ public class HospitalInfoService {
     double deltaLon = lon2Rad - lon1Rad;
 
     double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-        Math.cos(lat1Rad) * Math.cos(lat2Rad) *
-            Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+            Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                    Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
 
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
