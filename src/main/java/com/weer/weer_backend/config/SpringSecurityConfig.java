@@ -14,11 +14,11 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable() // CSRF 보호 비활성화 (개발용)
-                .authorizeRequests()
-//                .requestMatchers("/hostpital-admin/**").hasRole("Hospital")
-//                .requestMatchers("/user/signup-request/","/user/approve-signup/","/user/list/","/user/update/{id}","/user/delete/").hasRole("Admin")
-                .requestMatchers("/auth/**","/main").permitAll() // 인증 없이 접근 허용
-                .anyRequest().authenticated(); // 그 외의 요청은 인증 필요
+                .authorizeRequests(authorize -> authorize
+                        .requestMatchers("/api/emergency").permitAll() // /api/emergency 엔드포인트 접근 허용
+                        .anyRequest().permitAll() // 그 외의 요청도 모두 접근 허용
+                );
+
         return http.build();
     }
 }
