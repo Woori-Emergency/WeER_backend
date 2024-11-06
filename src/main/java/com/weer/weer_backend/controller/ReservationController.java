@@ -41,13 +41,6 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(reservationDTO.getReservationStatus());
     }
 
-    // 유저 별 예약 리스트 확인
-    @GetMapping("/hospitals/reserve/{loginid}")
-    public ResponseEntity<Object> showUserReservation(@PathVariable(name = "loginid") Long loginid) {
-        List<Reservation> myReservation = reservationService.getUserReservation(loginid);
-        return ResponseEntity.status(HttpStatus.OK).body(myReservation);
-    }
-
     // 병원 별 예약 리스트
     @GetMapping("/hospitals/reservations/{hospitalid}")
     public ResponseEntity<Object> showHospitalReservation(@PathVariable(name = "hospitalid") Long hospitalid){

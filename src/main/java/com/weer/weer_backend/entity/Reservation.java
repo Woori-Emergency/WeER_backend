@@ -23,9 +23,6 @@ public class Reservation extends BaseEntity{
     @Column(name = "HOSPITAL_ID")
     private Long hospitalId;
 
-    @Column(name = "USER_ID")
-    private Long userId;
-
     @Column(name = "PATIENT_CONDITION_ID")
     private Long patientconditionid;
 

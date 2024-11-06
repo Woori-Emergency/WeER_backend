@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class PatientCondition extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PATIENT_CONDITION_ID")
     private Long patientconditionid;
 
@@ -33,7 +34,7 @@ public class PatientCondition extends BaseEntity {
     private Integer respiration; // 호흡수
 
     @Enumerated(EnumType.STRING)
-    private Condition conditions; // 질병 / 질병 외
+    private Medical medical; // 질병 / 질병 외
 
     @Enumerated(EnumType.STRING)
     private ConsciousnessLevel consciousnessLevel; // 의식 레벨
