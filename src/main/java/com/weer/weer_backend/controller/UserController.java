@@ -28,7 +28,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    // 회원가입 요청 리스트 조회 (PENDING 상태)
+    // 회원가입 요청 리스트 조회 (Approve -> False 상태)
     @GetMapping("/signup-requests/")
     public ResponseEntity<List<User>> getSignupRequests() {
         List<User> signupRequests = userService.getSignupRequests();
@@ -36,9 +36,10 @@ public class UserController {
     }
 
     // 요청된 회원가입 승인/반려
-    @PostMapping("/approve-signup/")
-    public ResponseEntity<String> approveSignup(@RequestParam Long userId, @RequestParam boolean approve) {
-        userService.approveSignup(userId, approve);
-        return ResponseEntity.ok("회원가입 " + (approve ? "승인" : "반려") + "되었습니다.");
+    @PostMapping("/approve-signup/{id}")
+    public ResponseEntity<String> approveSignup(@PathVariable Long id, @RequestParam boolean approve) {
+        userService.approveSignup(id, approve);
+        String status = approve ? "승인" : "반려";
+        return ResponseEntity.ok("User " + status + " 성공");
     }
 }
