@@ -21,33 +21,33 @@ public class HospitalInfoService {
 
   private static final double EARTH_RADIUS = 6371.0;
 
-  public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
-    List<Hospital> hospitalList = hospitalRepository.findAll();
-    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
-    for(Hospital hospital : hospitalList) {
-      double distance = getDistance(latitude,longitude,hospital);
-      if(distance <= range) {
-        AdmissionType admissionType = admissionTypeRepository
-            .findAdmissionTypeByHospitalId(hospital.getHospitalId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
-
-        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-            .hospitalName(hospital.getName())
-            .latitude(hospital.getLatitude())
-            .longitude(hospital.getLongitude())
-            .distance(distance)
-            .roadDistance(mapInfo.getDistance())
-            .duration(mapInfo.getDuration())
-            .availableBeds(admissionType.getAvailableBeds())
-            .totalBeds(admissionType.getTotalBeds())
-            .build();
-        rangeHospitalList.add(hospitalRangeDto);
-      }
-    }
-    return rangeHospitalList;
-  }
+//  public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
+//    List<Hospital> hospitalList = hospitalRepository.findAll();
+//    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
+//    for(Hospital hospital : hospitalList) {
+//      double distance = getDistance(latitude,longitude,hospital);
+//      if(distance <= range) {
+//        AdmissionType admissionType = admissionTypeRepository
+//            .findAdmissionTypeByHospitalId(hospital.getHospitalId())
+//            .orElseThrow(IllegalArgumentException::new);
+//
+//        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
+//
+//        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
+//            .hospitalName(hospital.getName())
+//            .latitude(hospital.getLatitude())
+//            .longitude(hospital.getLongitude())
+//            .distance(distance)
+//            .roadDistance(mapInfo.getDistance())
+//            .duration(mapInfo.getDuration())
+//            .availableBeds(admissionType.getAvailableBeds())
+//            .totalBeds(admissionType.getTotalBeds())
+//            .build();
+//        rangeHospitalList.add(hospitalRangeDto);
+//      }
+//    }
+//    return rangeHospitalList;
+//  }
   private MapInfoResponseDto getMapInfo(Double latitude, Double longitude, Hospital hospital) {
     return mapService.getMapInfo(latitude,longitude, hospital.getLatitude()
     , hospital.getLongitude());
