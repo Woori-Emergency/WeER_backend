@@ -36,9 +36,9 @@ public class LoginServiceImpl implements LoginService {
     public void signUp(UserDTO userDTO) {
         // 비동기식으로 이미 LoginId와 Email의 중복은 체크를 한 후 회원가입이 가능
         // if문이 과연 필요한가?
-        if (userRepository.existsByLoginId(userDTO.getLoginId())) {
+        /*if (userRepository.existsByLoginId(userDTO.getLoginId())) {
             throw new IllegalArgumentException("ID 중복");
-        }
+        }*/
         User user = User.builder()
                 .loginId(userDTO.getLoginId())
                 .name(userDTO.getName())
@@ -53,6 +53,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public boolean isLoginIdDuplicate(String loginId) {
+
         return userRepository.existsByLoginId(loginId);
     }
 
