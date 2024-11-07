@@ -17,15 +17,17 @@ public class Hospital extends BaseEntity {
     @Column(name = "HOSPITAL_ID")
     private Long hospitalId;
 
-    @Column(name = "EQUIPMENT_ID")
-    private Long equipmentId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "EQUIPMENT_ID")
+    private Equipment equipmentId;
 
-    @Column(name = "ICU_ID")
-    private Long icuId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ICU_ID")
+    private Icu icuId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EMERGENCY_ID")
-    private EmergencyRoomInfo emergencyId;
+    private Emergency emergencyId;
 
     @Column(name = "HPID", unique = true)
     private String hpid;  // 병원 식별 코드 (ID)

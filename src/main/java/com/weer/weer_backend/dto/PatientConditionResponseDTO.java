@@ -42,8 +42,8 @@ public class PatientConditionResponseDTO {
                 .medical(entity.getMedical())
                 .consciousnessLevel(entity.getConsciousnessLevel())
                 .transportStatus(entity.getTransportStatus())
-                .createdAt(entity.getCreated_at())
-                .modifiedAt(entity.getModified_at())
+                .createdAt(entity.getCreatedAt())
+                .modifiedAt(entity.getModifiedAt())
                 .build();
     }
 }

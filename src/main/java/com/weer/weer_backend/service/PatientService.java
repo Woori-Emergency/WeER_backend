@@ -60,8 +60,8 @@ public class PatientService {
                 .hospitalId(reservation.getHospitalId())
                 .patientconditionId(reservation.getPatientconditionid())
                 .reservationStatus(reservation.getReservationStatus())
-                .createdAt(reservation.getCreated_at())
-                .modifiedAt(reservation.getModified_at())
+                .createdAt(reservation.getCreatedAt())
+                .modifiedAt(reservation.getModifiedAt())
                 .build();
     }
 
