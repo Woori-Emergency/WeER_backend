@@ -12,15 +12,30 @@ import com.weer.weer_backend.service.OpenApiService;
 public class OpenApiController {
 
     @Autowired
-    private OpenApiService emergencyService;
+    private OpenApiService openApiService;
 
-    @GetMapping("/api/emergency")
-    public String getEmergencyInfo(
+    // 개별 시/구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
+//    @GetMapping("/api/emergency")
+//    public String getEmergencyInfo(
+//            @RequestParam String stage1,
+//            @RequestParam String stage2) {
+//
+//        log.info("getEmergencyInfo called with stage1={}, stage2={}", stage1, stage2);
+//
+//        return openApiService.getEmergencyInfoAndSave(stage1, stage2, 1, 10);
+//    }
+
+    // 특정 시의 모든 구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
+    @GetMapping("/api/emergency/all")
+    public String getEmergencyInfoForAllDistricts(
             @RequestParam String stage1,
-            @RequestParam String stage2) {
+            @RequestParam(defaultValue = "1") int pageNo,
+            @RequestParam(defaultValue = "10") int numOfRows) {
 
-        log.info("getEmergencyInfo called with stage1={}, stage2={}", stage1, stage2);
+        log.info("getEmergencyInfoForAllDistricts called with stage1={}, pageNo={}, numOfRows={}",
+                stage1, pageNo, numOfRows);
 
-        return emergencyService.getEmergencyInfo(stage1, stage2);
+        openApiService.getEmergencyInfoForAllDistricts(stage1, pageNo, numOfRows);
+        return "모든 구에 대한 데이터 요청 및 저장 완료";
     }
 }
