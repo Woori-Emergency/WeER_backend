@@ -1,6 +1,7 @@
 package com.weer.weer_backend.controller;
 
 import com.weer.weer_backend.dto.ReservationDTO;
+import com.weer.weer_backend.dto.ReservationRequestDto;
 import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
 import com.weer.weer_backend.service.ReservationService;
@@ -46,5 +47,10 @@ public class ReservationController {
     public ResponseEntity<Object> showHospitalReservation(@PathVariable(name = "hospitalid") Long hospitalid){
         List<Reservation> myReservation = reservationService.getHospitalReservation(hospitalid);
         return ResponseEntity.status(HttpStatus.OK).body(myReservation);
+    }
+
+    @PostMapping("/hospital/reserve")
+    public ResponseEntity<String> reserveHospital(@RequestBody ReservationRequestDto reservationDTO){
+        return ResponseEntity.ok(reservationService.reservationRequest(reservationDTO));
     }
 }
