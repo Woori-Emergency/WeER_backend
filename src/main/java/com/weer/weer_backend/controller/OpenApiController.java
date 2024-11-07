@@ -14,17 +14,6 @@ public class OpenApiController {
     @Autowired
     private OpenApiService openApiService;
 
-    // 개별 시/구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
-//    @GetMapping("/api/emergency")
-//    public String getEmergencyInfo(
-//            @RequestParam String stage1,
-//            @RequestParam String stage2) {
-//
-//        log.info("getEmergencyInfo called with stage1={}, stage2={}", stage1, stage2);
-//
-//        return openApiService.getEmergencyInfoAndSave(stage1, stage2, 1, 10);
-//    }
-
     // 특정 시의 모든 구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
     @GetMapping("/api/emergency/seoul")
     public String getEmergencyInfoForAllDistricts() {
