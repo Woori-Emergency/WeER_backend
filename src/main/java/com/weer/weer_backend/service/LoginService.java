@@ -11,7 +11,4 @@ public interface LoginService {
 
     public boolean isEmailDuplicate(String email);
 
-
-
-
 }
