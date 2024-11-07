@@ -1,13 +1,16 @@
 package com.weer.weer_backend.entity;
 
 import com.weer.weer_backend.enums.ReservationStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,7 +32,8 @@ public class Reservation extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    public void changeStatus(ReservationStatus newStatus){
+    public Reservation changeStatus(ReservationStatus newStatus){
         this.reservationStatus = newStatus;
+        return this;
     }
 }
