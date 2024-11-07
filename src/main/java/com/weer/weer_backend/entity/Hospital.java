@@ -1,26 +1,19 @@
 package com.weer.weer_backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @Entity
-@Table(name = "HOSPITAL")
+@Table(name = "HOSPITAL", uniqueConstraints = @UniqueConstraint(columnNames = "HPID"))
 public class Hospital extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "HOSPITAL_ID")
     private Long hospitalId;
 
@@ -34,7 +27,7 @@ public class Hospital extends BaseEntity {
     @JoinColumn(name = "EMERGENCY_ID")
     private EmergencyRoomInfo emergencyId;
 
-    @Column(name = "HPID")
+    @Column(name = "HPID", unique = true)
     private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "NAME")

@@ -17,6 +17,7 @@ import java.util.Date;
 public class Emergency extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EMERGENCY_ID")
     private Long emergencyId;  // 응급실 고유 ID
 
