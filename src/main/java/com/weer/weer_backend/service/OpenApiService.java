@@ -16,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -97,7 +99,8 @@ public class OpenApiService {
                         .longitude(longitude != null ? Double.parseDouble(longitude) : null)
                         .build();
 
-                hospitalRepository.save(hospital);
+                // hpid로 병원 정보를 저장하거나 업데이트하는 메서드 호출
+                saveOrUpdateHospital(hpid, dutyName, dutyAddr, dutyTel1, dutyTel3, latitude, longitude);
             }
 
         } catch (Exception e) {
@@ -108,10 +111,27 @@ public class OpenApiService {
         return "서울특별시 데이터가 저장되었습니다.";
     }
 
+    //hpid가 존재하면 업데이트, 존재하지 않으면 삽입
+    private void saveOrUpdateHospital(String hpid, String name, String address, String tel, String erTel, String latitude, String longitude) {
+        Optional<Hospital> existingHospital = hospitalRepository.findByHpid(hpid);
+
+        Hospital hospital = existingHospital.orElseGet(Hospital::new);
+        hospital.setHpid(hpid);
+        hospital.setName(name);
+        hospital.setAddress(address);
+        hospital.setTel(tel);
+        hospital.setErTel(erTel);
+        hospital.setLatitude(latitude != null ? Double.parseDouble(latitude) : null);
+        hospital.setLongitude(longitude != null ? Double.parseDouble(longitude) : null);
+
+        hospitalRepository.save(hospital);
+    }
+
     // Helper method to get text content safely
     private String getTextContentSafely(Document doc, String tagName, int index) {
         NodeList nodeList = doc.getElementsByTagName(tagName);
         return (nodeList != null && nodeList.item(index) != null) ? nodeList.item(index).getTextContent() : null;
     }
+
 
 }
