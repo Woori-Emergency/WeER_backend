@@ -14,7 +14,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -106,7 +105,7 @@ public class OpenApiService {
             return "XML 파싱 오류 발생";
         }
 
-        return "데이터가 저장되었습니다.";
+        return "서울특별시 데이터가 저장되었습니다.";
     }
 
     // Helper method to get text content safely
