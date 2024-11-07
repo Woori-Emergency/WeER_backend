@@ -9,5 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
-    // 병원 관련 추가 메서드 정의 가능
+
+    boolean existsByHpid(String hpid); // hpid로 중복 여부 확인
+    Optional<Hospital> findByHpid(String hpid);
+
 }

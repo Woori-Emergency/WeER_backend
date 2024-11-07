@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
                 .role(existingUser.getRole())
                 .email(existingUser.getEmail())
                 .certificate(existingUser.getCertificate())
-                .approved(existingUser.isApproved())
+                .approved(existingUser.getApproved())
                 .name(userUpdateDTO.getName())
                 .tel(userUpdateDTO.getTel())
                 .organization(userUpdateDTO.getOrganization())
