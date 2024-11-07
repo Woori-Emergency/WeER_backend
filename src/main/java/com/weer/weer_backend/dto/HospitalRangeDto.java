@@ -9,7 +9,6 @@ public class HospitalRangeDto {
   private String hospitalName;
   private Double latitude;
   private Double longitude;
-  private Double distance;
   private Integer roadDistance;
   private Integer duration;
   private int availableBeds;

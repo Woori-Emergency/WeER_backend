@@ -1,17 +1,24 @@
 package com.weer.weer_backend.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.weer.weer_backend.dto.HospitalDTO;
+import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
-import com.weer.weer_backend.entity.AdmissionType;
+import com.weer.weer_backend.dto.MapInfoResponseDto;
+import com.weer.weer_backend.entity.Emergency;
+import com.weer.weer_backend.entity.Equipment;
 import com.weer.weer_backend.entity.Hospital;
+import com.weer.weer_backend.entity.Icu;
 import com.weer.weer_backend.repository.HospitalRepository;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,84 +27,188 @@ import org.mockito.MockitoAnnotations;
 
 class HospitalInfoServiceTest {
 
-  @InjectMocks
-  private HospitalInfoService hospitalInfoService;
-
   @Mock
   private HospitalRepository hospitalRepository;
 
+  @Mock
+  private MapService mapService;
+
+  @InjectMocks
+  private HospitalInfoService hospitalInfoService;
+
   @BeforeEach
-  public void setup() {
+  void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
   @Test
-  public void testGetRangeAllHospital() {
-    Hospital hospital1 = Hospital.builder()
-        .hospitalId(1L)
-        .name("Hospital A")
-        .latitude(37.7749)
-        .longitude(-122.4194)
+  void testFilterHospital() {
+    // Arrange
+    HospitalFilterDto filterDto = HospitalFilterDto.builder()
+        .city("CityA")
+        .state("StateA")
         .build();
 
-    Hospital hospital2 = Hospital.builder()
-        .hospitalId(2L)
-        .name("Hospital B")
-        .latitude(37.8044)
-        .longitude(-122.2711)
+    Equipment equipment = Equipment.builder()
+        .equipmentId(1L)
+        .hvventiAYN(true)
+        .build();
+    Emergency emergency = Emergency.builder()
+        .emergencyId(1L)
         .build();
 
-    List<Hospital> hospitals = Arrays.asList(hospital1, hospital2);
-
-    AdmissionType admissionType1 = AdmissionType.builder()
-        .availableBeds(5)
-        .totalBeds(10)
+    Icu icu = Icu.builder()
+        .icuId(1L)
+        .hvcc(1)
         .build();
 
-    when(hospitalRepository.findAll()).thenReturn(hospitals);
-    List<HospitalRangeDto> result = hospitalInfoService.getRangeAllHospital(37.7749, -122.4194, 50);
+    Hospital hospital = Hospital.builder()
+        .city("CityA")
+        .state("StateA")
+        .equipmentId(equipment)
+        .emergencyId(emergency)
+        .icuId(icu)
+        .build();
 
-    assertEquals(2, result.size());
+    when(hospitalRepository.findByCityAndAndState("CityA", "StateA"))
+        .thenReturn(Collections.singletonList(hospital));
 
-    HospitalRangeDto hospitalRangeDto1 = result.get(0);
-    assertEquals("Hospital A", hospitalRangeDto1.getHospitalName());
-    assertEquals(37.7749, hospitalRangeDto1.getLatitude());
-    assertEquals(-122.4194, hospitalRangeDto1.getLongitude());
-    assertEquals(5, hospitalRangeDto1.getAvailableBeds());
-    assertEquals(10, hospitalRangeDto1.getTotalBeds());
+    // Act
+    List<HospitalDTO> result = hospitalInfoService.filterHospital(filterDto);
 
-    HospitalRangeDto hospitalRangeDto2 = result.get(1);
-    assertEquals("Hospital B", hospitalRangeDto2.getHospitalName());
-    assertEquals(37.8044, hospitalRangeDto2.getLatitude());
-    assertEquals(-122.2711, hospitalRangeDto2.getLongitude());
-    assertEquals(5, hospitalRangeDto2.getAvailableBeds());
-    assertEquals(10, hospitalRangeDto2.getTotalBeds());
-
-    verify(hospitalRepository, times(1)).findAll();
+    // Assert
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    verify(hospitalRepository, times(1)).findByCityAndAndState("CityA", "StateA");
   }
 
   @Test
-  public void testGetRangeAllHospital_NoHospitalInRange() {
-    Hospital hospital1 = Hospital.builder()
+  void testGetHospitalDetail() {
+    // Arrange
+    Equipment equipment = Equipment.builder()
+        .equipmentId(1L)
+        .hvventiAYN(true)
+        .build();
+    Emergency emergency = Emergency.builder()
+        .emergencyId(1L)
+        .build();
+    Icu icu = Icu.builder()
+        .icuId(1L)
+        .hvcc(1)
+        .build();
+    Hospital hospital = Hospital.builder()
         .hospitalId(1L)
-        .name("Hospital A")
-        .latitude(40.7128)  // 뉴욕
-        .longitude(-74.0060)
+        .equipmentId(equipment)
+        .emergencyId(emergency)
+        .icuId(icu)
         .build();
 
-    Hospital hospital2 = Hospital.builder()
-        .hospitalId(2L)
-        .name("Hospital B")
-        .latitude(34.0522)  // LA
-        .longitude(-118.2437)
+    when(hospitalRepository.findById(1L)).thenReturn(Optional.of(hospital));
+
+    // Act
+    HospitalDTO result = hospitalInfoService.getHospitalDetail(1L);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(1L, result.getHospitalId());
+    verify(hospitalRepository, times(1)).findById(1L);
+  }
+
+  @Test
+  void testGetRangeAllHospital() {
+    // Arrange
+    Double latitude = 40.7128;
+    Double longitude = -74.0060;
+    int range = 10;
+
+    Emergency emergency = Emergency.builder()
+        .emergencyId(1L)
+        .hvec(1)
+        .hvs01(8)
         .build();
 
-    List<Hospital> hospitals = Arrays.asList(hospital1, hospital2);
+    Equipment equipment = Equipment.builder()
+        .equipmentId(1L)
+        .build();
 
-    // Mock 설정
-    when(hospitalRepository.findAll()).thenReturn(hospitals);
+    Icu icu = Icu.builder()
+        .icuId(1L)
+        .build();
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-        () -> hospitalInfoService.getRangeAllHospital(37.7749, -122.4194, 50));
+    Hospital hospital = Hospital.builder()
+        .latitude(40.7127)
+        .longitude(-74.0059)
+        .name("HospitalA")
+        .emergencyId(emergency)
+        .equipmentId(equipment)
+        .icuId(icu)
+        .build();
+
+    MapInfoResponseDto mapInfo = MapInfoResponseDto.builder()
+        .distance(5)
+        .duration(10)
+        .build();
+
+    when(hospitalRepository.findAll()).thenReturn(Collections.singletonList(hospital));
+    when(mapService.getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude()))
+        .thenReturn(mapInfo);
+
+    // Act
+    List<HospitalRangeDto> result = hospitalInfoService.getRangeAllHospital(latitude, longitude, range);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals("HospitalA", result.get(0).getHospitalName());
+    verify(hospitalRepository, times(1)).findAll();
+    verify(mapService, times(1)).getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude());
+  }
+
+  @Test
+  void testFilterHospitalWithEmergencyAndIcuAndEquipmentFilters() {
+    // Arrange
+    HospitalFilterDto filterDto = HospitalFilterDto.builder()
+        .city("CityA")
+        .state("StateA")
+        .hvec(false)
+        .hvcc(true)
+        .hvventiAYN(true)
+        .build();
+
+    Emergency emergency = Emergency.builder()
+        .emergencyId(1L)
+        .hvec(1)
+        .hvs01(8)
+        .build();
+
+    Equipment equipment = Equipment.builder()
+        .equipmentId(1L)
+        .hvventiAYN(true)
+        .build();
+
+    Icu icu = Icu.builder()
+        .icuId(1L)
+        .hvcc(1)
+        .build();
+
+    Hospital hospital = Hospital.builder()
+        .city("CityA")
+        .state("StateA")
+        .equipmentId(equipment)
+        .emergencyId(emergency)
+        .icuId(icu)
+        .build();
+
+    when(hospitalRepository.findByCityAndAndState("CityA", "StateA"))
+        .thenReturn(Collections.singletonList(hospital));
+
+    // Act
+    List<HospitalDTO> result = hospitalInfoService.filterHospital(filterDto);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertTrue(result.stream().allMatch(h -> h.getCity().equals("CityA")));
+    verify(hospitalRepository, times(1)).findByCityAndAndState("CityA", "StateA");
   }
 }
