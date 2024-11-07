@@ -17,6 +17,7 @@ import java.util.Date;
 public class Equipment extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EQUIPMENT_ID")
     private Long equipmentId;  // 장비 고유 ID
 

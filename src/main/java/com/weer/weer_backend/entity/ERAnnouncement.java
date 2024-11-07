@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class ERAnnouncement {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ANNOUNCEMENT_ID")
     private Long announcementId;  // 공지사항 고유 ID
 

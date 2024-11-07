@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class Icu extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ICU_ID")
     private Long icuId;  // 중환자실 고유 ID
 
