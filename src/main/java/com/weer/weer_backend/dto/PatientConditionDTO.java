@@ -2,6 +2,7 @@ package com.weer.weer_backend.dto;
 
 import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.enums.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PatientConditionDTO {
+
+    @NotNull(message = "성별은 필수 입력값입니다")
     private Gender gender;
+    @NotNull(message = "연령대는 필수 입력값입니다")
     private AgeGroup ageGroup;
     private Integer bloodPressure;
     private Integer heartRate;
@@ -23,8 +27,8 @@ public class PatientConditionDTO {
 
     public PatientCondition toEntity(Long userId) {
         return PatientCondition.builder()
-                .userId(userId)  // 로그인한 사용자 ID
-                .transportStatus(TransportStatus.IN_PROGRESS)  // 초기 이송 상태
+                .userId(userId)
+                .transportStatus(TransportStatus.IN_PROGRESS)
                 .gender(this.gender)
                 .ageGroup(this.ageGroup)
                 .bloodPressure(this.bloodPressure)
@@ -33,7 +37,6 @@ public class PatientConditionDTO {
                 .respiration(this.respiration)
                 .medical(this.medical)
                 .consciousnessLevel(this.consciousnessLevel)
-
                 .build();
     }
 }

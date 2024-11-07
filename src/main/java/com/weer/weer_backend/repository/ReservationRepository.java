@@ -11,4 +11,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 예약 관련 추가 메서드 정의 가능
     List<Reservation> findAllByHospitalId(Long hospitalId);
     Reservation findByReservationId(Long reservationId);
+    List<Reservation> findAllByPatientconditionid(Long patientconditionid);
 }
