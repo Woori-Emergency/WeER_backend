@@ -13,6 +13,7 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable() // CSRF 보호 비활성화 (개발용)
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/api/emergency").permitAll() // /api/emergency 엔드포인트 접근 허용
                         .anyRequest().permitAll() // 그 외의 요청도 모두 접근 허용
