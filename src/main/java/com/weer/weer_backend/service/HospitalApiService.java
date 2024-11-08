@@ -2,6 +2,7 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.repository.HospitalRepository;
+import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,15 +89,15 @@ public class HospitalApiService {
             // item 노드 리스트 가져오기
             NodeList items = doc.getElementsByTagName("item");
             for (int i = 0; i < items.getLength(); i++) {
-                String dutyAddr = getTextContentSafely(doc, "dutyAddr", i);
-                String dutyEmcls = getTextContentSafely(doc, "dutyEmcls", i);
-                String dutyEmclsName = getTextContentSafely(doc, "dutyEmclsName", i);
-                String dutyName = getTextContentSafely(doc, "dutyName", i);
-                String dutyTel1 = getTextContentSafely(doc, "dutyTel1", i);
-                String dutyTel3 = getTextContentSafely(doc, "dutyTel3", i);
-                String hpid = getTextContentSafely(doc, "hpid", i);
-                String latitude = getTextContentSafely(doc, "wgs84Lat", i);
-                String longitude = getTextContentSafely(doc, "wgs84Lon", i);
+                String dutyAddr = XmlParsingUtils.getTextContentSafely(doc, "dutyAddr", i);
+                String dutyEmcls = XmlParsingUtils.getTextContentSafely(doc, "dutyEmcls", i);
+                String dutyEmclsName = XmlParsingUtils.getTextContentSafely(doc, "dutyEmclsName", i);
+                String dutyName = XmlParsingUtils.getTextContentSafely(doc, "dutyName", i);
+                String dutyTel1 = XmlParsingUtils.getTextContentSafely(doc, "dutyTel1", i);
+                String dutyTel3 = XmlParsingUtils.getTextContentSafely(doc, "dutyTel3", i);
+                String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
+                String latitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lat", i);
+                String longitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lon", i);
 
                 Hospital hospital = Hospital.builder()
                         .hpid(hpid)
@@ -135,12 +136,5 @@ public class HospitalApiService {
 
         hospitalRepository.save(hospital);
     }
-
-    // Helper method to get text content safely
-    private String getTextContentSafely(Document doc, String tagName, int index) {
-        NodeList nodeList = doc.getElementsByTagName(tagName);
-        return (nodeList != null && nodeList.item(index) != null) ? nodeList.item(index).getTextContent() : null;
-    }
-
 
 }

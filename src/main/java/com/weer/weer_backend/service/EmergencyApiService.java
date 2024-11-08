@@ -5,6 +5,7 @@ import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
 import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
+import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -73,21 +74,21 @@ public class EmergencyApiService {
 
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
-                    String hpid = getTextContentSafely(doc, "hpid", i);
-                    Integer hvec = parseIntegerSafely(doc, "hvec", i);
-                    Integer hv27 = parseIntegerSafely(doc, "hv27", i);
-                    Integer hv29 = parseIntegerSafely(doc, "hv29", i);
-                    Integer hv30 = parseIntegerSafely(doc, "hv30", i);
-                    Integer hv28 = parseIntegerSafely(doc, "hv28", i);
-                    Integer hv15 = parseIntegerSafely(doc, "hv15", i);
-                    Integer hv16 = parseIntegerSafely(doc, "hv16", i);
-                    Integer hvs01 = parseIntegerSafely(doc, "hvs01", i);
-                    Integer hvs59 = parseIntegerSafely(doc, "hvs59", i);
-                    Integer hvs52 = parseIntegerSafely(doc, "hvs52", i);
-                    Integer hvs51 = parseIntegerSafely(doc, "hvs51", i);
-                    Integer hvs02 = parseIntegerSafely(doc, "hvs02", i);
-                    Integer hvs48 = parseIntegerSafely(doc, "hvs48", i);
-                    Integer hvs49 = parseIntegerSafely(doc, "hvs49", i);
+                    String hpid =  XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
+                    Integer hvec = XmlParsingUtils.parseIntegerSafely(doc, "hvec", i);
+                    Integer hv27 = XmlParsingUtils.parseIntegerSafely(doc, "hv27", i);
+                    Integer hv29 = XmlParsingUtils.parseIntegerSafely(doc, "hv29", i);
+                    Integer hv30 = XmlParsingUtils.parseIntegerSafely(doc, "hv30", i);
+                    Integer hv28 = XmlParsingUtils.parseIntegerSafely(doc, "hv28", i);
+                    Integer hv15 = XmlParsingUtils.parseIntegerSafely(doc, "hv15", i);
+                    Integer hv16 = XmlParsingUtils.parseIntegerSafely(doc, "hv16", i);
+                    Integer hvs01 = XmlParsingUtils.parseIntegerSafely(doc, "hvs01", i);
+                    Integer hvs59 = XmlParsingUtils.parseIntegerSafely(doc, "hvs59", i);
+                    Integer hvs52 = XmlParsingUtils.parseIntegerSafely(doc, "hvs52", i);
+                    Integer hvs51 = XmlParsingUtils.parseIntegerSafely(doc, "hvs51", i);
+                    Integer hvs02 = XmlParsingUtils.parseIntegerSafely(doc, "hvs02", i);
+                    Integer hvs48 = XmlParsingUtils.parseIntegerSafely(doc, "hvs48", i);
+                    Integer hvs49 = XmlParsingUtils.parseIntegerSafely(doc, "hvs49", i);
                     saveOrUpdateEmergency(hpid, hvec, hv27, hv29, hv30, hv28, hv15, hv16, hvs01, hvs59, hvs52, hvs51, hvs02, hvs48, hvs49);
                 }
             } catch (Exception e) {
@@ -138,13 +139,4 @@ public class EmergencyApiService {
         }
     }
 
-    private String getTextContentSafely(Document doc, String tagName, int index) {
-        NodeList nodeList = doc.getElementsByTagName(tagName);
-        return (nodeList != null && nodeList.item(index) != null) ? nodeList.item(index).getTextContent() : null;
-    }
-
-    private Integer parseIntegerSafely(Document doc, String tagName, int index) {
-        String textContent = getTextContentSafely(doc, tagName, index);
-        return textContent != null ? Integer.parseInt(textContent) : null;
-    }
 }

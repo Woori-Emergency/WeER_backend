@@ -5,6 +5,7 @@ import com.weer.weer_backend.entity.Icu;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.repository.IcuRepository;
+import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -67,32 +68,32 @@ public class IcuApiService {
 
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
-                    String hpid = getTextContentSafely(doc, "hpid", i);
+                    String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
 
-                    Integer hvcc = parseIntegerSafely(doc, "hvcc", i);
-                    Integer hvncc = parseIntegerSafely(doc, "hvncc", i);
-                    Integer hvccc = parseIntegerSafely(doc, "hvccc", i);
-                    Integer hvicc = parseIntegerSafely(doc, "hvicc", i);
-                    Integer hv2 = parseIntegerSafely(doc, "hv2", i);
-                    Integer hv3 = parseIntegerSafely(doc, "hv3", i);
-                    Integer hv6 = parseIntegerSafely(doc, "hv6", i);
-                    Integer hv8 = parseIntegerSafely(doc, "hv8", i);
-                    Integer hv9 = parseIntegerSafely(doc, "hv9", i);
-                    Integer hv32 = parseIntegerSafely(doc, "hv32", i);
-                    Integer hv34 = parseIntegerSafely(doc, "hv34", i);
-                    Integer hv35 = parseIntegerSafely(doc, "hv35", i);
-                    Integer hvs11 = parseIntegerSafely(doc, "hvs11", i);
-                    Integer hvS08 = parseIntegerSafely(doc, "hvs08", i);
-                    Integer hvs16 = parseIntegerSafely(doc, "hvs16", i);
-                    Integer hvs17 = parseIntegerSafely(doc, "hvs17", i);
-                    Integer hvs06 = parseIntegerSafely(doc, "hvs06", i);
-                    Integer hvs07 = parseIntegerSafely(doc, "hvs07", i);
-                    Integer hvs12 = parseIntegerSafely(doc, "hvs12", i);
-                    Integer hvs13 = parseIntegerSafely(doc, "hvs13", i);
-                    Integer hvs14 = parseIntegerSafely(doc, "hvs14", i);
-                    Integer hvs09 = parseIntegerSafely(doc, "hvs09", i);
-                    Integer hvs15 = parseIntegerSafely(doc, "hvs15", i);
-                    Integer hvs18 = parseIntegerSafely(doc, "hvs18", i);
+                    Integer hvcc = XmlParsingUtils.parseIntegerSafely(doc, "hvcc", i);
+                    Integer hvncc = XmlParsingUtils.parseIntegerSafely(doc, "hvncc", i);
+                    Integer hvccc = XmlParsingUtils.parseIntegerSafely(doc, "hvccc", i);
+                    Integer hvicc = XmlParsingUtils.parseIntegerSafely(doc, "hvicc", i);
+                    Integer hv2 = XmlParsingUtils.parseIntegerSafely(doc, "hv2", i);
+                    Integer hv3 = XmlParsingUtils.parseIntegerSafely(doc, "hv3", i);
+                    Integer hv6 = XmlParsingUtils.parseIntegerSafely(doc, "hv6", i);
+                    Integer hv8 = XmlParsingUtils.parseIntegerSafely(doc, "hv8", i);
+                    Integer hv9 = XmlParsingUtils.parseIntegerSafely(doc, "hv9", i);
+                    Integer hv32 = XmlParsingUtils.parseIntegerSafely(doc, "hv32", i);
+                    Integer hv34 = XmlParsingUtils.parseIntegerSafely(doc, "hv34", i);
+                    Integer hv35 = XmlParsingUtils.parseIntegerSafely(doc, "hv35", i);
+                    Integer hvs11 = XmlParsingUtils.parseIntegerSafely(doc, "hvs11", i);
+                    Integer hvS08 = XmlParsingUtils.parseIntegerSafely(doc, "hvs08", i);
+                    Integer hvs16 = XmlParsingUtils.parseIntegerSafely(doc, "hvs16", i);
+                    Integer hvs17 = XmlParsingUtils.parseIntegerSafely(doc, "hvs17", i);
+                    Integer hvs06 = XmlParsingUtils.parseIntegerSafely(doc, "hvs06", i);
+                    Integer hvs07 = XmlParsingUtils.parseIntegerSafely(doc, "hvs07", i);
+                    Integer hvs12 = XmlParsingUtils.parseIntegerSafely(doc, "hvs12", i);
+                    Integer hvs13 = XmlParsingUtils.parseIntegerSafely(doc, "hvs13", i);
+                    Integer hvs14 = XmlParsingUtils.parseIntegerSafely(doc, "hvs14", i);
+                    Integer hvs09 = XmlParsingUtils.parseIntegerSafely(doc, "hvs09", i);
+                    Integer hvs15 = XmlParsingUtils.parseIntegerSafely(doc, "hvs15", i);
+                    Integer hvs18 = XmlParsingUtils.parseIntegerSafely(doc, "hvs18", i);
 
                     saveOrUpdateIcu(hpid, hvcc, hvncc, hvccc, hvicc, hv2, hv3, hv6, hv8, hv9, hv32, hv34, hv35, hvs11,
                             hvS08, hvs16, hvs17, hvs06, hvs07, hvs12, hvs13, hvs14, hvs09, hvs15, hvs18);
@@ -155,18 +156,4 @@ public class IcuApiService {
         }
     }
 
-
-    private String getTextContentSafely(Document doc, String tagName, int index) {
-        NodeList nodeList = doc.getElementsByTagName(tagName.toLowerCase());
-        if (nodeList == null || nodeList.item(index) == null) {
-            System.out.println("Tag not found or is null for: " + tagName);
-            return null;
-        }
-        return nodeList.item(index).getTextContent();
-    }
-
-    private Integer parseIntegerSafely(Document doc, String tagName, int index) {
-        String textContent = getTextContentSafely(doc, tagName, index);
-        return textContent != null ? Integer.parseInt(textContent) : null;
-    }
 }
