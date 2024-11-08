@@ -6,7 +6,7 @@ import org.w3c.dom.NodeList;
 public class XmlParsingUtils {
 
     /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 안전하게 텍스트 콘텐츠를 가져옵니다.
+     * XML Document에서 지정한 태그 이름과 인덱스로 안전하게 텍스트 콘텐츠를 가져온다
      *
      * @param doc XML Document 객체
      * @param tagName 태그 이름
@@ -19,7 +19,7 @@ public class XmlParsingUtils {
     }
 
     /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 Integer 값을 안전하게 파싱합니다.
+     * XML Document에서 지정한 태그 이름과 인덱스로 Integer 값을 안전하게 파싱
      *
      * @param doc XML Document 객체
      * @param tagName 태그 이름
@@ -32,8 +32,8 @@ public class XmlParsingUtils {
     }
 
     /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 Boolean 값을 안전하게 파싱합니다.
-     * "Y"이면 true, "N1"이면 false로 변환하며, 그 외는 null로 처리합니다.
+     * XML Document에서 지정한 태그 이름과 인덱스로 Boolean 값을 안전하게 파싱
+     * "Y"이면 true, "N1"이면 false로 변환하며, 그 외는 null로 처리
      *
      * @param doc XML Document 객체
      * @param tagName 태그 이름
