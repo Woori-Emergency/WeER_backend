@@ -1,8 +1,11 @@
 package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.entity.Equipment;
+import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
 import com.weer.weer_backend.repository.EquipmentRepository;
+import com.weer.weer_backend.repository.HospitalRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EquipmentApiService {
@@ -30,6 +34,8 @@ public class EquipmentApiService {
             "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구",
             "용산구", "은평구", "종로구", "중구", "중랑구"
     );
+    @Autowired
+    private HospitalRepository hospitalRepository;
 
     @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
@@ -37,6 +43,7 @@ public class EquipmentApiService {
         getEquipmentInfoForAllDistricts();
     }
 
+    @Transactional
     public String getEquipmentInfoForAllDistricts() {
         for (String district : districts) {
             String xmlResponse = commonApiService.getCachedApiResponseForDistrict(district);
@@ -60,16 +67,16 @@ public class EquipmentApiService {
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
                     String hpid = getTextContentSafely(doc, "hpid", i);
-                    Boolean hvventiAYN = parseBooleanSafely(doc, "hvventiAYN", i);
-                    Boolean hvventisoAYN = parseBooleanSafely(doc, "hvventisoAYN", i);
-                    Boolean hvinCUAYN = parseBooleanSafely(doc, "hvinCUAYN", i);
-                    Boolean hvcrrTAYN = parseBooleanSafely(doc, "hvcrrTAYN", i);
-                    Boolean hvecmoAYN = parseBooleanSafely(doc, "hvecmoAYN", i);
-                    Boolean hvhypoAYN = parseBooleanSafely(doc, "hvhypoAYN", i);
-                    Boolean hvoxyAYN = parseBooleanSafely(doc, "hvoxyAYN", i);
-                    Boolean hvctAYN = parseBooleanSafely(doc, "hvctAYN", i);
-                    Boolean hvmriAYN = parseBooleanSafely(doc, "hvmriAYN", i);
-                    Boolean hvangioAYN = parseBooleanSafely(doc, "hvangioAYN", i);
+                    Boolean hvventiAYN = parseBooleanSafely(doc, "hvventiayn", i);
+                    Boolean hvventisoAYN = parseBooleanSafely(doc, "hvventisoayn", i);
+                    Boolean hvinCUAYN = parseBooleanSafely(doc, "hvincuayn", i);
+                    Boolean hvcrrTAYN = parseBooleanSafely(doc, "hvcrrtayn", i);
+                    Boolean hvecmoAYN = parseBooleanSafely(doc, "hvecmoayn", i);
+                    Boolean hvhypoAYN = parseBooleanSafely(doc, "hvhypoayn", i);
+                    Boolean hvoxyAYN = parseBooleanSafely(doc, "hvoxyayn", i);
+                    Boolean hvctAYN = parseBooleanSafely(doc, "hvctayn", i);
+                    Boolean hvmriAYN = parseBooleanSafely(doc, "hvmriayn", i);
+                    Boolean hvangioAYN = parseBooleanSafely(doc, "hvangioayn", i);
 
                     Integer hvs30 = parseIntegerSafely(doc, "hvs30", i);
                     Integer hvs31 = parseIntegerSafely(doc, "hvs31", i);
@@ -98,12 +105,17 @@ public class EquipmentApiService {
                                        Boolean hvecmoAYN, Boolean hvhypoAYN, Boolean hvoxyAYN, Boolean hvctAYN, Boolean hvmriAYN,
                                        Boolean hvangioAYN, Integer hvs30, Integer hvs31, Integer hvs32, Integer hvs33, Integer hvs34,
                                        Integer hvs35, Integer hvs37, Integer hvs27, Integer hvs28, Integer hvs29) {
+        // Optional<Hospital>을 통해 hpid로 Hospital 엔티티 검색
+        Optional<Hospital> hospitalOptional = hospitalRepository.findByHpid(hpid);
+
+        // Equipment 엔티티 생성 또는 기존 엔티티 로드
         Equipment equipment = equipmentRepository.findByHpid(hpid).orElse(new Equipment());
 
         if (equipment.getHpid() == null) {
             equipment.setHpid(hpid);
         }
 
+        // Equipment 필드 설정
         equipment.setHvventiAYN(hvventiAYN);
         equipment.setHvventisoAYN(hvventisoAYN);
         equipment.setHvinCUAYN(hvinCUAYN);
@@ -125,26 +137,42 @@ public class EquipmentApiService {
         equipment.setHvs28(hvs28);
         equipment.setHvs29(hvs29);
 
-        equipmentRepository.save(equipment);
+        // Equipment 저장
+        equipment = equipmentRepository.save(equipment);
+
+        // Hospital이 존재할 경우 외래 키 관계 설정 후 저장
+        if (hospitalOptional.isPresent()) {
+            Hospital hospital = hospitalOptional.get();
+            hospital.setEquipmentId(equipment);  // Hospital에 Equipment 외래키 설정
+            hospitalRepository.save(hospital);   // Hospital 저장
+        } else {
+            System.out.println("해당 hpid(" + hpid + ")에 대한 Hospital을 찾을 수 없습니다.");
+        }
     }
 
     private String getTextContentSafely(Document doc, String tagName, int index) {
-        NodeList nodeList = doc.getElementsByTagName(tagName);
-        return (nodeList != null && nodeList.item(index) != null) ? nodeList.item(index).getTextContent() : null;
+        NodeList nodeList = doc.getElementsByTagName(tagName.toLowerCase());
+        if (nodeList == null || nodeList.item(index) == null) {
+            System.out.println("Tag not found or is null for: " + tagName);
+            return null;
+        }
+        return nodeList.item(index).getTextContent();
     }
+
+    private Boolean parseBooleanSafely(Document doc, String tagName, int index) {
+        String textContent = getTextContentSafely(doc, tagName, index);
+        if ("Y".equalsIgnoreCase(textContent)) {
+            return true;
+        } else if ("N1".equalsIgnoreCase(textContent)) {
+            return false;
+        }
+        return null; // If the value is neither "Y" nor "N1"
+    }
+
 
     private Integer parseIntegerSafely(Document doc, String tagName, int index) {
         String textContent = getTextContentSafely(doc, tagName, index);
         return textContent != null ? Integer.parseInt(textContent) : null;
     }
 
-    private Boolean parseBooleanSafely(Document doc, String tagName, int index) {
-        String textContent = getTextContentSafely(doc, tagName, index);
-        if ("Y".equals(textContent)) {
-            return true;
-        } else if ("N1".equals(textContent)) {
-            return false;
-        }
-        return null; // 다른 값일 경우 null로 처리
-    }
 }
