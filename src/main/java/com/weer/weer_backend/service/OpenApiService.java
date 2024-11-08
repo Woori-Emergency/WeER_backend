@@ -41,20 +41,23 @@ public class OpenApiService {
             "용산구", "은평구", "종로구", "중구", "중랑구"
     );
 
-    public void getEmergencyInfoForAllDistricts(String stage1, int pageNo, int numOfRows) {
+    public void getHospitalInfoForAllDistricts() {
+        int pageNo = 1;
+        int numOfRows = 10;
+        String stage1 = "서울특별시";
         for (String stage2 : districts) {
-            getEmergencyInfoAndSave(stage1, stage2, pageNo, numOfRows);
+            getHospitalInfoAndSave(stage1, stage2, pageNo, numOfRows);
         }
     }
 
-    public String getEmergencyInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
+    public String getHospitalInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
         URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
                 .queryParam("serviceKey", SERVICE_KEY)
                 .queryParam("Q0", stage1)
-                .queryParam("Q1", stage2) // `stage2`를 그대로 전달
+                .queryParam("Q1", stage2)
                 .queryParam("pageNo", pageNo)
                 .queryParam("numOfRows", numOfRows)
-                .encode(StandardCharsets.UTF_8) // 한 번만 인코딩
+                .encode(StandardCharsets.UTF_8)
                 .build()
                 .toUri();
 

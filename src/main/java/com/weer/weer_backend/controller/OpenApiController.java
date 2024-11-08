@@ -14,16 +14,13 @@ public class OpenApiController {
     @Autowired
     private OpenApiService openApiService;
 
-    // 특정 시의 모든 구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
-    @GetMapping("/api/emergency/seoul")
+    // 서울특별시의 모든 구에 대해 응급실 정보를 요청하고 저장하는 엔드포인트
+    @GetMapping("/api/hospital/seoul")
     public String getEmergencyInfoForAllDistricts() {
-        int pageNo = 1;
-        int numOfRows = 10;
-        String stage1 = "서울특별시";
-        log.info("getEmergencyInfoForAllDistricts called with stage1={}, pageNo={}, numOfRows={}",
-                stage1, pageNo, numOfRows);
 
-        openApiService.getEmergencyInfoForAllDistricts(stage1, pageNo, numOfRows);
+        log.info("getEmergencyInfoForAllDistricts called");
+
+        openApiService.getHospitalInfoForAllDistricts();
         return "서울특별시의 모든 구에 대한 데이터 요청 및 저장 완료";
     }
 }
