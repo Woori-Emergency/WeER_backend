@@ -1,14 +1,12 @@
 package com.weer.weer_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @Entity
 @Table(name = "ICU")
@@ -18,6 +16,9 @@ public class Icu extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ICU_ID")
     private Long icuId;  // 중환자실 고유 ID
+
+    @Column(name = "HPID", unique = true)
+    private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "HVCC")
     private Integer hvcc;  // 신경과 병상 수
@@ -59,7 +60,7 @@ public class Icu extends BaseEntity {
     private Integer hvs11;  // 신경과 (기준) 병상 수
 
     @Column(name = "HVS08")
-    private Integer hvS08;  // 신생아 (기준) 병상 수
+    private Integer hvs08;  // 신생아 (기준) 병상 수
 
     @Column(name = "HVS16")
     private Integer hvs16;  // 흉부외과 (기준) 병상 수
@@ -83,7 +84,7 @@ public class Icu extends BaseEntity {
     private Integer hvs14;  // 외상 (기준) 병상 수
 
     @Column(name = "HVS09")
-    private Integer hvS09;  // 소아 (기준) 병상 수
+    private Integer hvs09;  // 소아 (기준) 병상 수
 
     @Column(name = "HVS15")
     private Integer hvs15;  // 심장내과 (기준) 병상 수

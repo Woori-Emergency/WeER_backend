@@ -1,16 +1,14 @@
 package com.weer.weer_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @Entity
 @Table(name = "EQUIPMENT")
@@ -20,6 +18,9 @@ public class Equipment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EQUIPMENT_ID")
     private Long equipmentId;  // 장비 고유 ID
+
+    @Column(name = "HPID", unique = true)
+    private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "HVVENTIAYN")
     private Boolean hvventiAYN;  // 인공호흡기 일반 사용 가능 여부

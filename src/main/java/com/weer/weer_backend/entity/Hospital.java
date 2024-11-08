@@ -17,15 +17,15 @@ public class Hospital extends BaseEntity {
     @Column(name = "HOSPITAL_ID")
     private Long hospitalId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "EQUIPMENT_ID")
     private Equipment equipmentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ICU_ID")
     private Icu icuId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "EMERGENCY_ID")
     private Emergency emergencyId;
 
