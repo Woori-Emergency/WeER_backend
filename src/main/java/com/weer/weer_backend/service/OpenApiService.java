@@ -2,6 +2,7 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.repository.HospitalRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,13 @@ public class OpenApiService {
             "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구",
             "용산구", "은평구", "종로구", "중구", "중랑구"
     );
+
+    // 애플리케이션 시작 시 한 번 실행되는 메서드
+    @PostConstruct
+    public void init() {
+        System.out.println("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
+        getHospitalInfoForAllDistricts();
+    }
 
     public void getHospitalInfoForAllDistricts() {
         int pageNo = 1;

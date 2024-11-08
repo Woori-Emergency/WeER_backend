@@ -19,6 +19,9 @@ public class Icu extends BaseEntity {
     @Column(name = "ICU_ID")
     private Long icuId;  // 중환자실 고유 ID
 
+    @Column(name = "HPID", unique = true)
+    private String hpid;  // 병원 식별 코드 (ID)
+
     @Column(name = "HVCC")
     private Integer hvcc;  // 신경과 병상 수
 
