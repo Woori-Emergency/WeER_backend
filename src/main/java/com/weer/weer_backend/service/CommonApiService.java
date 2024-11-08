@@ -41,8 +41,7 @@ public class CommonApiService {
         this.eventPublisher = eventPublisher;
     }
 
-    //@Scheduled(fixedRate = 3600000) // 60분마다 호출
-    @Scheduled(fixedRate = 100000)
+    @Scheduled(fixedRate = 3600000) // 60분마다 호출
     public void updateApiDataForAllDistricts() {
         System.out.println("서울특별시 모든 구에 대한 외부 API 데이터 갱신 중...");
         for (String district : districts) {
