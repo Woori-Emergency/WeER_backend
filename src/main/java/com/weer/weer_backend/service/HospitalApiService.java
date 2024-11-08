@@ -95,10 +95,16 @@ public class HospitalApiService {
                 String latitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lat", i);
                 String longitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lon", i);
 
+                // city와 state를 address에서 추출하는 로직
+                String city = parseCityFromAddress(dutyAddr);
+                String state = parseStateFromAddress(dutyAddr);
+
                 Hospital hospital = Hospital.builder()
                         .hpid(hpid)
                         .name(dutyName)
                         .address(dutyAddr)
+                        .city(city)
+                        .state(state)
                         .tel(dutyTel1)
                         .erTel(dutyTel3)
                         .latitude(latitude != null ? Double.parseDouble(latitude) : null)
@@ -106,7 +112,7 @@ public class HospitalApiService {
                         .build();
 
                 // hpid로 병원 정보를 저장하거나 업데이트하는 메서드 호출
-                saveOrUpdateHospital(hpid, dutyName, dutyAddr, dutyTel1, dutyTel3, latitude, longitude);
+                saveOrUpdateHospital(hpid, dutyName, dutyAddr, city, state, dutyTel1, dutyTel3, latitude, longitude);
             }
 
         } catch (Exception e) {
@@ -117,14 +123,16 @@ public class HospitalApiService {
         return "서울특별시 데이터가 저장되었습니다.";
     }
 
-    //hpid가 존재하면 업데이트, 존재하지 않으면 삽입
-    private void saveOrUpdateHospital(String hpid, String name, String address, String tel, String erTel, String latitude, String longitude) {
+    // hpid가 존재하면 업데이트, 존재하지 않으면 삽입
+    private void saveOrUpdateHospital(String hpid, String name, String address, String city, String state, String tel, String erTel, String latitude, String longitude) {
         Optional<Hospital> existingHospital = hospitalRepository.findByHpid(hpid);
 
         Hospital hospital = existingHospital.orElseGet(Hospital::new);
         hospital.setHpid(hpid);
         hospital.setName(name);
         hospital.setAddress(address);
+        hospital.setCity(city);
+        hospital.setState(state);
         hospital.setTel(tel);
         hospital.setErTel(erTel);
         hospital.setLatitude(latitude != null ? Double.parseDouble(latitude) : null);
@@ -133,4 +141,23 @@ public class HospitalApiService {
         hospitalRepository.save(hospital);
     }
 
+    // 주소에서 시/도를 추출하는 메서드
+    private String parseCityFromAddress(String address) {
+        if (address != null && address.length() > 0) {
+            String[] parts = address.split(" ");
+            return parts[0]; // 예: "서울특별시"
+        }
+        return null;
+    }
+
+    // 주소에서 구를 추출하는 메서드
+    private String parseStateFromAddress(String address) {
+        if (address != null && address.length() > 0) {
+            String[] parts = address.split(" ");
+            if (parts.length > 1) {
+                return parts[1]; // 예: "강남구"
+            }
+        }
+        return null;
+    }
 }
