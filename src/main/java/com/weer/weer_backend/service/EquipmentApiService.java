@@ -169,7 +169,6 @@ public class EquipmentApiService {
         return null; // If the value is neither "Y" nor "N1"
     }
 
-
     private Integer parseIntegerSafely(Document doc, String tagName, int index) {
         String textContent = getTextContentSafely(doc, tagName, index);
         return textContent != null ? Integer.parseInt(textContent) : null;

@@ -3,6 +3,7 @@ package com.weer.weer_backend.service;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.repository.HospitalRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,10 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 @Service
-public class OpenApiService {
+public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
     private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
@@ -49,6 +46,7 @@ public class OpenApiService {
         getHospitalInfoForAllDistricts();
     }
 
+    @Transactional
     public void getHospitalInfoForAllDistricts() {
         int pageNo = 1;
         int numOfRows = 10;

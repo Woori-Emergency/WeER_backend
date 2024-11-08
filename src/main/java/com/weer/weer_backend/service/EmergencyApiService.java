@@ -5,6 +5,7 @@ import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
 import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class EmergencyApiService {
      * 서울특별시의 모든 구에 대하여 실시간 정보 가져와 저장
      * @return
      */
+    @Transactional
     public String getEmergencyInfoForAllDistricts() {
         for (String district : districts) {
             String xmlResponse = commonApiService.getCachedApiResponseForDistrict(district);
