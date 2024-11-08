@@ -1,28 +1,27 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql:3306/WeER?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: root
-    password: root
-
   jpa:
-    hibernate:
-      ddl-auto: update  # 개발 시는 `update`를 권장 (운영에서는 `validate`나 `none`으로 변경)
+    generate-ddl: false
     show-sql: true
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/WeER?characterEncoding=UTF-8&setTimezone=Asia/Seoul
+    username: root
+    password: root
   profiles:
     include: secret
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus  # Actuator에서 노출할 엔드포인트
-  prometheus:
     metrics:
       export:
-        enabled: true
-
+        prometheus:
+          enabled: true
