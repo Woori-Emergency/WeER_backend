@@ -56,11 +56,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getSignupRequests() {
-        return userRepository.findByApproved(false);  // 승인 대기 중인 사용자 조회
+        return userRepository.findByApprovedIsNull();  // 승인 대기 중인 사용자 조회
     }
 
     @Override
-    public void approveSignup(Long userId, boolean approve) {
+    public void approveSignup(Long userId, Boolean approve) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user = User.builder()

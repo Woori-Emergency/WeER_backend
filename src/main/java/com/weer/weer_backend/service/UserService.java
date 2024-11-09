@@ -20,5 +20,5 @@ public interface UserService {
     List<User> getSignupRequests();
 
     // 회원가입 요청 승인/반려 처리
-    void approveSignup(Long userId, boolean approve);
+    void approveSignup(Long userId, Boolean approve);
 }
