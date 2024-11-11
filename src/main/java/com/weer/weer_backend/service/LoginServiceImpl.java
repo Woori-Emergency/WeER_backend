@@ -4,10 +4,11 @@ import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 import com.weer.weer_backend.entity.User;
 import com.weer.weer_backend.enums.Role;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,18 +22,17 @@ public class LoginServiceImpl implements LoginService {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
-    public UserDTO authenticate(LoginForm loginForm) throws Exception {
+    public UserDTO authenticate(LoginForm loginForm){
         User user = userRepository.findByLoginId(loginForm.getLoginId())
-            .orElseThrow(() -> new Exception("User not found"));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
-            throw new Exception("Wrong password");
+            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
         if (!user.getApproved()){
-            throw new IllegalArgumentException("죄송합니다 반려된 계정입니다.");
+            throw new CustomException(ErrorCode.UNAPPROVED_ACCOUNT);
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getLoginId());
-        
+        userDetailsService.loadUserByUsername(user.getLoginId());
 
         return convertToDTO(user);
     }
@@ -45,7 +45,7 @@ public class LoginServiceImpl implements LoginService {
             throw new IllegalArgumentException("ID 중복");
         }*/
         if(userRepository.existsByEmail(userDTO.getEmail())){
-            throw new IllegalArgumentException("Exist an account with this email");
+            throw new CustomException(ErrorCode.ALREADY_REGISTER_USER);
         }
         User user = User.builder()
                 .loginId(userDTO.getLoginId())

@@ -31,12 +31,8 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public void signup(@RequestBody UserDTO userDTO) throws IOException {
-        try {
-            loginService.signUp(userDTO);
-        }catch (Exception e){
-            throw new IOException(String.valueOf(ResponseEntity.badRequest()));
-        }
+    public void signup(@RequestBody UserDTO userDTO){
+        loginService.signUp(userDTO);
     }
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
