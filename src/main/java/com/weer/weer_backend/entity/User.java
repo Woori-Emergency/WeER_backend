@@ -1,5 +1,6 @@
 package com.weer.weer_backend.entity;
 
+import com.weer.weer_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,6 @@ public class User extends BaseEntity{
     private String certificate;
     private String organization;
     private Boolean approved; // 승인 여부 필드 추가
-    @Builder.Default
-    private String role = "User";
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

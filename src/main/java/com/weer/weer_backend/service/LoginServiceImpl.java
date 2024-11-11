@@ -1,10 +1,13 @@
 package com.weer.weer_backend.service;
 
+import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 import com.weer.weer_backend.entity.User;
+import com.weer.weer_backend.enums.Role;
 import com.weer.weer_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +18,22 @@ public class LoginServiceImpl implements LoginService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
-    public UserDTO authenticate(String loginId, String password) throws Exception {
-        User user = userRepository.findByLoginId(loginId);
+    public UserDTO authenticate(LoginForm loginForm) throws Exception {
+        User user = userRepository.findByLoginId(loginForm.getLoginId())
+            .orElseThrow(() -> new Exception("User not found"));
 
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            throw new SecurityException("아이디 또는 비밀번호가 틀렸습니다.");
-        }
-        if (user.getApproved() == null) {
-            throw new IllegalStateException("회원가입이 아직 승인되지 않았습니다. : " + loginId);
+        if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
+            throw new Exception("Wrong password");
         }
         if (!user.getApproved()){
             throw new IllegalArgumentException("죄송합니다 반려된 계정입니다.");
         }
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getLoginId());
+        
+
         return convertToDTO(user);
     }
 
@@ -39,12 +44,17 @@ public class LoginServiceImpl implements LoginService {
         /*if (userRepository.existsByLoginId(userDTO.getLoginId())) {
             throw new IllegalArgumentException("ID 중복");
         }*/
+        if(userRepository.existsByEmail(userDTO.getEmail())){
+            throw new IllegalArgumentException("Exist an account with this email");
+        }
         User user = User.builder()
                 .loginId(userDTO.getLoginId())
                 .name(userDTO.getName())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
                 .tel(userDTO.getTel())
+                .role(Role.MEMBER)
+                .approved(false)
                 .certificate(userDTO.getCertificate())
                 .organization(userDTO.getOrganization())
                 .build();
@@ -65,10 +75,8 @@ public class LoginServiceImpl implements LoginService {
 
     private UserDTO convertToDTO(User user) {
         return UserDTO.builder()
-                .userId(user.getUserId())
                 .loginId(user.getLoginId())
                 .name(user.getName())
-                .role(user.getRole())
                 .email(user.getEmail())
                 .tel(user.getTel())
                 .organization(user.getOrganization())
