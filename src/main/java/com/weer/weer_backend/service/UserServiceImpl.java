@@ -6,6 +6,7 @@ import com.weer.weer_backend.entity.User;
 import com.weer.weer_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,24 +35,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, UserUpdateDTO userUpdateDTO) {
+    @Transactional
+    public UserResponseDTO updateUser(Long userId, UserUpdateDTO userUpdateDTO) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User updatedUser = User.builder()
-                .userId(existingUser.getUserId())  // 기존 기본 키 유지
-                .loginId(existingUser.getLoginId())
-                .password(existingUser.getPassword())
-                .role(existingUser.getRole())
-                .email(existingUser.getEmail())
-                .certificate(existingUser.getCertificate())
-                .approved(existingUser.getApproved())
-                .name(userUpdateDTO.getName())
-                .tel(userUpdateDTO.getTel())
-                .organization(userUpdateDTO.getOrganization())
-                .build();
+        existingUser.updateWith(userUpdateDTO);
 
-        return userRepository.save(updatedUser);
+        return UserResponseDTO.from(existingUser);
     }
 
     @Override

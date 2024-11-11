@@ -1,9 +1,10 @@
 package com.weer.weer_backend.service;
 
+import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 
 public interface LoginService {
-    UserDTO authenticate(String loginId, String password) throws Exception;
+    UserDTO authenticate(LoginForm loginForm) throws Exception;
 
     void signUp(UserDTO userDTO);
 

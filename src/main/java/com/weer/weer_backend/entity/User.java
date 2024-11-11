@@ -1,6 +1,7 @@
 package com.weer.weer_backend.entity;
 
 import com.weer.weer_backend.dto.UserUpdateDTO;
+import com.weer.weer_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @Entity
 @Table(name = "USER")
 public class User extends BaseEntity{
@@ -30,8 +31,8 @@ public class User extends BaseEntity{
     private String certificate;
     private String organization;
     private Boolean approved; // 승인 여부 필드 추가
-    @Builder.Default
-    private String role = "User";
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     // 필드 업데이트 메서드
     public void updateWith(UserUpdateDTO userUpdateDTO) {
