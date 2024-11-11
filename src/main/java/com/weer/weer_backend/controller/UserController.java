@@ -27,7 +27,8 @@ public class UserController {
     // 유저 정보 수정
     @PutMapping("/update/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updateDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, updateDTO));
+        UserResponseDTO updatedUser = userService.updateUser(id, updateDTO);
+        return ResponseEntity.ok(updatedUser);
     }
 
     // 회원가입 요청 리스트 조회 (Approved = False 상태)
