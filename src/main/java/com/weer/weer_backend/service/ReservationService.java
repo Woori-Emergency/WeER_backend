@@ -56,7 +56,7 @@ public class ReservationService {
             reservationRepository.save(reservationRequestDto.from());
             return "success";
         }catch (Exception e){
-            return "error";
+            return e.getMessage();
         }
     }
 }

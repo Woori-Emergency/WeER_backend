@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
 public class Reservation extends BaseEntity{
     @Id
     @Column(name = "RESERVATION_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
 
     @Column(name = "HOSPITAL_ID")
