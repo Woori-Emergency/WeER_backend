@@ -1,5 +1,6 @@
 package com.weer.weer_backend.entity;
 
+import com.weer.weer_backend.dto.UserUpdateDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "USER")
 public class User extends BaseEntity{
@@ -31,4 +32,11 @@ public class User extends BaseEntity{
     private Boolean approved; // 승인 여부 필드 추가
     @Builder.Default
     private String role = "User";
+
+    // 필드 업데이트 메서드
+    public void updateWith(UserUpdateDTO userUpdateDTO) {
+        this.name = userUpdateDTO.getName();
+        this.tel = userUpdateDTO.getTel();
+        this.organization = userUpdateDTO.getOrganization();
+    }
 }
