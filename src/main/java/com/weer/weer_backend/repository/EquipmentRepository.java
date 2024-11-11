@@ -4,7 +4,11 @@ import com.weer.weer_backend.entity.Equipment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
-    // 장비 관련 추가 메서드 정의 가능
+
+    Optional<Equipment> findByHpid(String hpid);
+
 }
