@@ -20,6 +20,14 @@ public enum ErrorCode {
   // SignUp
   DATABASE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "회원정보 DB 저장에 실패하였습니다.");
 
+  UNAPPROVED_ACCOUNT(HttpStatus.BAD_REQUEST,"반려된 계정입니다."),
+
+  //Hospital
+  NOT_FOUND_HOSPITAL(HttpStatus.BAD_REQUEST, "해당하는 병원을 찾을 수 없습니다."),
+  NOT_FOUND_EMERGENCY(HttpStatus.BAD_REQUEST, "해당하는 응급실을 찾을 수 없습니다."),
+
+  //locationInfo
+  NOT_FOUND_ROUTE(HttpStatus.BAD_REQUEST,"경로를 찾을 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String detail;

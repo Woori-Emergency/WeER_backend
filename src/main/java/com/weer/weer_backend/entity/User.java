@@ -1,6 +1,7 @@
 package com.weer.weer_backend.entity;
 
 import com.weer.weer_backend.enums.Approve;
+import com.weer.weer_backend.dto.UserUpdateDTO;
 import com.weer.weer_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,4 +35,11 @@ public class User extends BaseEntity{
     private Approve approved;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // 필드 업데이트 메서드
+    public void updateWith(UserUpdateDTO userUpdateDTO) {
+        this.name = userUpdateDTO.getName();
+        this.tel = userUpdateDTO.getTel();
+        this.organization = userUpdateDTO.getOrganization();
+    }
 }

@@ -2,6 +2,7 @@ package com.weer.weer_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -9,6 +10,7 @@ import lombok.*;
 @Setter
 @Builder
 @Entity
+@DynamicUpdate
 @Table(name = "HOSPITAL", uniqueConstraints = @UniqueConstraint(columnNames = "HPID"))
 public class Hospital extends BaseEntity {
 

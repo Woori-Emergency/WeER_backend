@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface EmergencyRepository extends JpaRepository<Emergency, Long> {
 
     Optional<Emergency> findByHpid(String hpid);
+    boolean existsByHpid(String hpid);
 
 }
