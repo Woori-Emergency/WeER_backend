@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RouteResponseDto {
-  private String transId;
+  private String trans_Id;
   private List<RouteDto> routes;
 
   public MapInfoResponseDto to(){

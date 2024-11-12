@@ -13,9 +13,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class HospitalInfoService {
 
@@ -100,18 +102,21 @@ public class HospitalInfoService {
     List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
 
     for (Hospital hospital : rangeHospitals) {
-      MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
-
-      HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-          .hospitalName(hospital.getName())
-          .latitude(hospital.getLatitude())
-          .longitude(hospital.getLongitude())
-          .roadDistance(mapInfo.getDistance())
-          .duration(mapInfo.getDuration())
-          .availableBeds(hospital.getEmergencyId().getHvec())
-          .totalBeds(hospital.getEmergencyId().getHvs01())
-          .build();
-      rangeHospitalList.add(hospitalRangeDto);
+      try{
+        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
+        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
+            .hospitalName(hospital.getName())
+            .latitude(hospital.getLatitude())
+            .longitude(hospital.getLongitude())
+            .roadDistance(mapInfo.getDistance())
+            .duration(mapInfo.getDuration())
+            .availableBeds(hospital.getEmergencyId().getHvec())
+            .totalBeds(hospital.getEmergencyId().getHvs01())
+            .build();
+        rangeHospitalList.add(hospitalRangeDto);
+      }catch (Exception e){
+        log.warn(e.getMessage());
+      }
     }
 
     return rangeHospitalList;
@@ -121,6 +126,7 @@ public class HospitalInfoService {
     List<Hospital> hospitalList = hospitalRepository.findAll();
     List<Hospital> rangeHospitalList = new ArrayList<>();
     for (Hospital hospital : hospitalList) {
+      if(hospital.getEquipmentId()==null || hospital.getEmergencyId()==null || hospital.getIcuId()==null) continue;
       double distance = getDistance(latitude, longitude, hospital.getLatitude(), hospital.getLongitude());
       if (distance <= range) {
         rangeHospitalList.add(hospital);

@@ -12,4 +12,5 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     List<Hospital> findByCityAndAndState(String city, String state);
     boolean existsByHpid(String hpid); // hpid로 중복 여부 확인
     Optional<Hospital> findByHpid(String hpid);
+
 }
