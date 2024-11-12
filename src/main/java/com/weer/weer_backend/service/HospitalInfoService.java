@@ -49,6 +49,7 @@ public class HospitalInfoService {
         , filter.getState());
 
     return hospitals.stream()
+        .filter(h -> h.getIcuId()!=null || h.getEmergencyId() != null || h.getEquipmentId() != null)
 
         // Emergency filters
         .filter(h -> !filter.isHvec() || h.getEmergencyId().getHvec() > 0)
