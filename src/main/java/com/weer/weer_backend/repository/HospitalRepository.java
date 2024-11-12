@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     // 병원 관련 추가 메서드 정의 가능
-    List<Hospital> findByCityAndAndState(String city, String state);
+    List<Hospital> findByCityAndState(String city, String state);
     boolean existsByHpid(String hpid); // hpid로 중복 여부 확인
     Optional<Hospital> findByHpid(String hpid);
 

@@ -70,7 +70,7 @@ class HospitalInfoServiceTest {
         .icuId(icu)
         .build();
 
-    when(hospitalRepository.findByCityAndAndState("CityA", "StateA"))
+    when(hospitalRepository.findByCityAndState("CityA", "StateA"))
         .thenReturn(Collections.singletonList(hospital));
 
     // Act
@@ -79,7 +79,7 @@ class HospitalInfoServiceTest {
     // Assert
     assertNotNull(result);
     assertEquals(1, result.size());
-    verify(hospitalRepository, times(1)).findByCityAndAndState("CityA", "StateA");
+    verify(hospitalRepository, times(1)).findByCityAndState("CityA", "StateA");
   }
 
   @Test
@@ -199,7 +199,7 @@ class HospitalInfoServiceTest {
         .icuId(icu)
         .build();
 
-    when(hospitalRepository.findByCityAndAndState("CityA", "StateA"))
+    when(hospitalRepository.findByCityAndState("CityA", "StateA"))
         .thenReturn(Collections.singletonList(hospital));
 
     // Act
@@ -209,6 +209,6 @@ class HospitalInfoServiceTest {
     assertNotNull(result);
     assertEquals(1, result.size());
     assertTrue(result.stream().allMatch(h -> h.getCity().equals("CityA")));
-    verify(hospitalRepository, times(1)).findByCityAndAndState("CityA", "StateA");
+    verify(hospitalRepository, times(1)).findByCityAndState("CityA", "StateA");
   }
 }
