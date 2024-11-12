@@ -4,6 +4,8 @@ import com.weer.weer_backend.constants.DistrictConstants;
 import com.weer.weer_backend.entity.Emergency;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
@@ -98,42 +100,30 @@ public class EmergencyApiService {
 
     private void saveOrUpdateEmergency(String hpid, Integer hvec, Integer hv27, Integer hv29, Integer hv30, Integer hv28, Integer hv15, Integer hv16,
                                        Integer hvs01, Integer hvs59, Integer hvs52, Integer hvs51, Integer hvs02, Integer hvs48, Integer hvs49) {
-        Optional<Hospital> hospitalOptional = hospitalRepository.findByHpid(hpid);
+        Hospital hospital = hospitalRepository.findByHpid(hpid)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
 
-        if (hospitalOptional.isPresent()) {
-            Hospital hospital = hospitalOptional.get();
+        Emergency updatedEmergency = Emergency.builder()
+            .hpid(hpid)
+            .hvec(hvec)
+            .hv27(hv27)
+            .hv29(hv29)
+            .hv30(hv30)
+            .hv28(hv28)
+            .hv15(hv15)
+            .hv16(hv16)
+            .hvs01(hvs01)
+            .hvs59(hvs59)
+            .hvs52(hvs52)
+            .hvs51(hvs51)
+            .hvs02(hvs02)
+            .hvs48(hvs48)
+            .hvs49(hvs49).build();
 
-            // hpid로 Emergency 정보 조회 또는 새로 생성
-            Emergency emergency = emergencyRepository.findByHpid(hpid).orElse(new Emergency());
-
-            if (emergency.getHpid() == null) {
-                emergency.setHpid(hpid);
-            }
-
-            // 필드 설정
-            emergency.setHvec(hvec);
-            emergency.setHv27(hv27);
-            emergency.setHv29(hv29);
-            emergency.setHv30(hv30);
-            emergency.setHv28(hv28);
-            emergency.setHv15(hv15);
-            emergency.setHv16(hv16);
-
-            emergency.setHvs01(hvs01);
-            emergency.setHvs59(hvs59);
-            emergency.setHvs52(hvs52);
-            emergency.setHvs51(hvs51);
-            emergency.setHvs02(hvs02);
-            emergency.setHvs48(hvs48);
-            emergency.setHvs49(hvs49);
-
-            // Hospital과의 외래 키 관계 설정
-            hospital.setEmergencyId(emergency);
-            emergencyRepository.save(emergency);  // Emergency 저장
-            hospitalRepository.save(hospital);    // Hospital 업데이트
-        } else {
-            System.out.println("해당 hpid(" + hpid + ")를 가진 Hospital을 찾을 수 없습니다.");
-        }
+        // Hospital과의 외래 키 관계 설정
+        emergencyRepository.save(updatedEmergency);  // Emergency 저장
+        hospital.setEmergencyId(updatedEmergency);    // Hospital 업데이트
+        hospitalRepository.save(hospital);
     }
 
 }
