@@ -4,9 +4,9 @@ import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 
 public interface LoginService {
-    UserDTO authenticate(LoginForm loginForm) throws Exception;
+//    public void authenticate(LoginForm loginForm) throws Exception;
 
-    void signUp(UserDTO userDTO);
+    public void signUp(UserDTO userDTO);
 
     public boolean isLoginIdDuplicate(String loginId);
 
