@@ -13,13 +13,13 @@ import org.springframework.http.HttpStatus;
 public class ApiResponse<T> {
     private int status;
     private String message;
-    private T data;
+    private T result;
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
                 .status(HttpStatus.OK.value())
                 .message("Success")
-                .data(data)
+                .result(data)
                 .build();
     }
 
@@ -27,15 +27,7 @@ public class ApiResponse<T> {
         return ApiResponse.<T>builder()
                 .status(HttpStatus.OK.value())
                 .message(message)
-                .data(data)
-                .build();
-    }
-
-    public static <T> ApiResponse<T> error(HttpStatus status, String message) {
-        return ApiResponse.<T>builder()
-                .status(status.value())
-                .message(message)
-                .data(null)
+                .result(data)
                 .build();
     }
 }

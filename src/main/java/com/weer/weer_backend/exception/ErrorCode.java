@@ -18,13 +18,14 @@ public enum ErrorCode {
   UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "로그인이 필요한 접근입니다."),
 
   // SignUp
-  DATABASE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "회원정보 DB 저장에 실패하였습니다.");
-
-  UNAPPROVED_ACCOUNT(HttpStatus.BAD_REQUEST,"반려된 계정입니다."),
+  DATABASE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "회원정보 DB 저장에 실패하였습니다."),
 
   //Hospital
   NOT_FOUND_HOSPITAL(HttpStatus.BAD_REQUEST, "해당하는 병원을 찾을 수 없습니다."),
   NOT_FOUND_EMERGENCY(HttpStatus.BAD_REQUEST, "해당하는 응급실을 찾을 수 없습니다."),
+
+  //Patient
+  PATIENT_SAVE_FAIL(HttpStatus.BAD_REQUEST,"환자 상태 저장에 실패했습니다."),
 
   //locationInfo
   NOT_FOUND_ROUTE(HttpStatus.BAD_REQUEST,"경로를 찾을 수 없습니다.");

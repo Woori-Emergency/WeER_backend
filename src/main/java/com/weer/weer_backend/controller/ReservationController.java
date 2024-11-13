@@ -1,12 +1,11 @@
 package com.weer.weer_backend.controller;
 
+import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.dto.ReservationRequestDto;
 import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
 import com.weer.weer_backend.service.ReservationService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +26,9 @@ public class ReservationController {
     ReservationStatus -> approve로 변경
      */
     @PostMapping("/hospitals/approve")
-    public ResponseEntity<ReservationStatus> approveHospital(ReservationDTO reservationDTO){
+    public ApiResponse<ReservationStatus> approveHospital(ReservationDTO reservationDTO){
         reservationService.reservationApprove(reservationDTO);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(reservationDTO.getReservationStatus());
+        return ApiResponse.success(reservationDTO.getReservationStatus());
     }
 
     // 병원에서 거절
@@ -37,20 +36,20 @@ public class ReservationController {
     ReservationStatus -> decline으로 변경
      */
     @PostMapping("/hospitals/decline")
-    public ResponseEntity<ReservationStatus> declineHospital(ReservationDTO reservationDTO){
+    public ApiResponse<ReservationStatus> declineHospital(ReservationDTO reservationDTO){
         reservationService.reservationReject(reservationDTO);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(reservationDTO.getReservationStatus());
+        return ApiResponse.success(reservationDTO.getReservationStatus());
     }
 
     // 병원 별 예약 리스트
     @GetMapping("/hospitals/reservations/{hospitalid}")
-    public ResponseEntity<Object> showHospitalReservation(@PathVariable(name = "hospitalid") Long hospitalid){
+    public ApiResponse<List<Reservation>> showHospitalReservation(@PathVariable(name = "hospitalid") Long hospitalid){
         List<Reservation> myReservation = reservationService.getHospitalReservation(hospitalid);
-        return ResponseEntity.status(HttpStatus.OK).body(myReservation);
+        return ApiResponse.success(myReservation);
     }
 
     @PostMapping("/hospital/reserve")
-    public ResponseEntity<String> reserveHospital(@RequestBody ReservationRequestDto reservationDTO){
-        return ResponseEntity.ok(reservationService.reservationRequest(reservationDTO));
+    public ApiResponse<String> reserveHospital(@RequestBody ReservationRequestDto reservationDTO){
+        return ApiResponse.success(reservationService.reservationRequest(reservationDTO));
     }
 }
