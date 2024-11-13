@@ -29,12 +29,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SpringSecurityConfig {
   private final AuthenticationConfiguration authenticationConfiguration;
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final TokenProvider tokenProvider;= new ObjectMapper();
+  private final TokenProvider tokenProvider;
 
-    public SpringSecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
-        this.authenticationConfiguration = authenticationConfiguration;
-        this.jwtUtil = jwtUtil;
-    }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
