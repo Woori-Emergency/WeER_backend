@@ -28,7 +28,7 @@ public class UserController {
   }
 
   // 유저 정보 수정
-  @PutMapping("/update/{id}")
+  @PutMapping("/update")
   public ApiResponse<UserResponseDTO> updateUser(@AuthenticationPrincipal SecurityUser user,
       @RequestBody UserUpdateDTO updateDTO) {
       Long id = user.getUser().getUserId();

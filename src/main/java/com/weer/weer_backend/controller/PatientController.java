@@ -68,7 +68,7 @@ public class PatientController {
     }
 
     //유저별 등록된 환자 리스트
-    @GetMapping("/user/reservation/{user_id}")
+    @GetMapping("/user/reservation")
     public ResponseEntity<ApiResponse<List<PatientConditionResponseDTO>>> getPatientList(
             @AuthenticationPrincipal SecurityUser user) {
         Long userId = user.getUser().getUserId();
