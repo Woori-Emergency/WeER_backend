@@ -4,6 +4,8 @@ import com.weer.weer_backend.entity.Hospital;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -12,5 +14,14 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     List<Hospital> findByCityAndState(String city, String state);
     boolean existsByHpid(String hpid); // hpid로 중복 여부 확인
     Optional<Hospital> findByHpid(String hpid);
+
+    @Query("SELECT h FROM Hospital h WHERE " +
+        "ST_Distance_Sphere(POINT(:longitude, :latitude), POINT(h.longitude, h.latitude)) <= :range")
+    List<Hospital> findRangeHospital(@Param("latitude") Double latitude,
+        @Param("longitude") Double longitude,
+        @Param("range") double range);
+
+
+
 
 }

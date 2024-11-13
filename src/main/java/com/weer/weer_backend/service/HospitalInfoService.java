@@ -4,7 +4,6 @@ import com.weer.weer_backend.dto.ERAnnouncementDTO;
 import com.weer.weer_backend.dto.HospitalDTO;
 import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
-import com.weer.weer_backend.dto.MapInfoResponseDto;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
@@ -13,11 +12,13 @@ import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -31,7 +32,7 @@ public class HospitalInfoService {
   private static final double EARTH_RADIUS = 6371.0;
 
   @Cacheable(value = "announce", key = "#hospitalId", unless = "#result == null")
-  public List<ERAnnouncementDTO> getAnnounce(long hospitalId){
+  public List<ERAnnouncementDTO> getAnnounce(long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
     return erAnnouncementRepository.findAllByHospitalId(hospital)
@@ -51,102 +52,146 @@ public class HospitalInfoService {
   }
 
   public List<HospitalDTO> filterHospital(HospitalFilterDto filter) {
-    List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(), filter.getState());
+    long startTime = System.currentTimeMillis();
+    List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(),
+        filter.getState());
+    long endTime = System.currentTimeMillis();  // 종료 시간
+    long duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Get DB : {} ms", duration);
+    startTime = System.currentTimeMillis();
 
-    return hospitals.stream()
-        .filter(h -> h.getIcuId()!=null || h.getEmergencyId() != null || h.getEquipmentId() != null)
-
-        // Emergency filters
-        .filter(h -> !filter.isHvec() || h.getEmergencyId().getHvec() > 0)
-        .filter(h -> !filter.isHv27() || h.getEmergencyId().getHv27() > 0)
-        .filter(h -> !filter.isHv29() || h.getEmergencyId().getHv29() > 0)
-        .filter(h -> !filter.isHv30() || h.getEmergencyId().getHv30() > 0)
-        .filter(h -> !filter.isHv28() || h.getEmergencyId().getHv28() > 0)
-        .filter(h -> !filter.isHv15() || h.getEmergencyId().getHv15() > 0)
-        .filter(h -> !filter.isHv16() || h.getEmergencyId().getHv16() > 0)
-
-        // ICU filters
-        .filter(h -> !filter.isHvcc() || h.getIcuId().getHvcc() > 0)
-        .filter(h -> !filter.isHvncc() || h.getIcuId().getHvncc() > 0)
-        .filter(h -> !filter.isHvccc() || h.getIcuId().getHvccc() > 0)
-        .filter(h -> !filter.isHvicc() || h.getIcuId().getHvicc() > 0)
-        .filter(h -> !filter.isHv2() || h.getIcuId().getHv2() > 0)
-        .filter(h -> !filter.isHv3() || h.getIcuId().getHv3() > 0)
-        .filter(h -> !filter.isHv6() || h.getIcuId().getHv6() > 0)
-        .filter(h -> !filter.isHv8() || h.getIcuId().getHv8() > 0)
-        .filter(h -> !filter.isHv9() || h.getIcuId().getHv9() > 0)
-        .filter(h -> !filter.isHv32() || h.getIcuId().getHv32() > 0)
-        .filter(h -> !filter.isHv34() || h.getIcuId().getHv34() > 0)
-        .filter(h -> !filter.isHv35() || h.getIcuId().getHv35() > 0)
-
-        // Equipment filters
-        .filter(h -> !filter.isHvventiAYN() || h.getEquipmentId().getHvventiAYN())
-        .filter(h -> !filter.isHvventisoAYN() || h.getEquipmentId().getHvventisoAYN())
-        .filter(h -> !filter.isHvinCUAYN() || h.getEquipmentId().getHvinCUAYN())
-        .filter(h -> !filter.isHvcrrTAYN() || h.getEquipmentId().getHvcrrTAYN())
-        .filter(h -> !filter.isHvecmoAYN() || h.getEquipmentId().getHvecmoAYN())
-        .filter(h -> !filter.isHvhypoAYN() || h.getEquipmentId().getHvhypoAYN())
-        .filter(h -> !filter.isHvoxyAYN() || h.getEquipmentId().getHvoxyAYN())
-        .filter(h -> !filter.isHvctAYN() || h.getEquipmentId().getHvctAYN())
-        .filter(h -> !filter.isHvmriAYN() || h.getEquipmentId().getHvmriAYN())
-        .filter(h -> !filter.isHvangioAYN() || h.getEquipmentId().getHvangioAYN())
-
-        // Map to HospitalDTO
+    List<HospitalDTO> dtos = hospitals.parallelStream()
+        .filter(h -> hasEssentialIds(h)
+            && applyEmergencyFilters(h, filter)
+            && applyICUFilters(h, filter)
+            && applyEquipmentFilters(h, filter))
         .map(HospitalDTO::from)
         .collect(Collectors.toList());
+    endTime = System.currentTimeMillis();  // 종료 시간
+    duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Filtering : {} ms", duration);
+    return dtos;
   }
+
+  private boolean hasEssentialIds(Hospital h) {
+    return h.getIcuId() != null || h.getEmergencyId() != null || h.getEquipmentId() != null;
+  }
+
+  private boolean applyEmergencyFilters(Hospital h, HospitalFilterDto filter) {
+    return (!filter.isHvec() || h.getEmergencyId().getHvec() > 0)
+        && (!filter.isHv27() || h.getEmergencyId().getHv27() > 0)
+        && (!filter.isHv29() || h.getEmergencyId().getHv29() > 0)
+        && (!filter.isHv30() || h.getEmergencyId().getHv30() > 0)
+        && (!filter.isHv28() || h.getEmergencyId().getHv28() > 0)
+        && (!filter.isHv15() || h.getEmergencyId().getHv15() > 0)
+        && (!filter.isHv16() || h.getEmergencyId().getHv16() > 0);
+  }
+
+  private boolean applyICUFilters(Hospital h, HospitalFilterDto filter) {
+    return (!filter.isHvcc() || h.getIcuId().getHvcc() > 0)
+        && (!filter.isHvncc() || h.getIcuId().getHvncc() > 0)
+        && (!filter.isHvccc() || h.getIcuId().getHvccc() > 0)
+        && (!filter.isHvicc() || h.getIcuId().getHvicc() > 0)
+        && (!filter.isHv2() || h.getIcuId().getHv2() > 0)
+        && (!filter.isHv3() || h.getIcuId().getHv3() > 0)
+        && (!filter.isHv6() || h.getIcuId().getHv6() > 0)
+        && (!filter.isHv8() || h.getIcuId().getHv8() > 0)
+        && (!filter.isHv9() || h.getIcuId().getHv9() > 0)
+        && (!filter.isHv32() || h.getIcuId().getHv32() > 0)
+        && (!filter.isHv34() || h.getIcuId().getHv34() > 0)
+        && (!filter.isHv35() || h.getIcuId().getHv35() > 0);
+  }
+
+  private boolean applyEquipmentFilters(Hospital h, HospitalFilterDto filter) {
+    return (!filter.isHvventiAYN() || h.getEquipmentId().getHvventiAYN())
+        && (!filter.isHvventisoAYN() || h.getEquipmentId().getHvventisoAYN())
+        && (!filter.isHvinCUAYN() || h.getEquipmentId().getHvinCUAYN())
+        && (!filter.isHvcrrTAYN() || h.getEquipmentId().getHvcrrTAYN())
+        && (!filter.isHvecmoAYN() || h.getEquipmentId().getHvecmoAYN())
+        && (!filter.isHvhypoAYN() || h.getEquipmentId().getHvhypoAYN())
+        && (!filter.isHvoxyAYN() || h.getEquipmentId().getHvoxyAYN())
+        && (!filter.isHvctAYN() || h.getEquipmentId().getHvctAYN())
+        && (!filter.isHvmriAYN() || h.getEquipmentId().getHvmriAYN())
+        && (!filter.isHvangioAYN() || h.getEquipmentId().getHvangioAYN());
+  }
+
 
   @Cacheable(value = "detail", key = "#hospitalId", unless = "#result == null")
   public HospitalDTO getHospitalDetail(Long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
     return HospitalDTO.from(hospital);
   }
 
+  @Transactional(readOnly = true)
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
-    List<Hospital> rangeHospitals = getRangeHospitals(latitude, longitude, range);
-    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
+    final int METERS_IN_KILOMETER = 1000;
+    int rangeMeters = range * METERS_IN_KILOMETER;
+    long startTime = System.currentTimeMillis();
 
+    // 범위 내 병원 조회
+    List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
+        rangeMeters);
+
+    List<CompletableFuture<HospitalRangeDto>> futureList = new ArrayList<>();
+
+    // 각 병원에 대해 비동기적으로 지도 정보 요청
     for (Hospital hospital : rangeHospitals) {
-      try{
-        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
-        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-            .hospitalName(hospital.getName())
-            .latitude(hospital.getLatitude())
-            .longitude(hospital.getLongitude())
-            .roadDistance(mapInfo.getDistance())
-            .duration(mapInfo.getDuration())
-            .availableBeds(hospital.getEmergencyId().getHvec())
-            .totalBeds(hospital.getEmergencyId().getHvs01())
-            .build();
-        rangeHospitalList.add(hospitalRangeDto);
-      }catch (Exception e){
-        log.warn(e.getMessage());
+      if (hospital.getEmergencyId() == null || hospital.getEquipmentId() == null
+          || hospital.getIcuId() == null) {
+        continue;
+      }
+
+      CompletableFuture<HospitalRangeDto> future = mapService.getMapInfo(latitude, longitude,
+              hospital.getLatitude(), hospital.getLongitude())
+          .thenApply(mapInfo -> {
+            if (mapInfo == null) {
+              log.warn("Map info is null for hospital: {}", hospital.getHospitalId());
+              return null;
+            }
+            return HospitalRangeDto.builder()
+                .hospitalName(hospital.getName())
+                .latitude(hospital.getLatitude())
+                .longitude(hospital.getLongitude())
+                .roadDistance(mapInfo.getDistance())
+                .duration(mapInfo.getDuration())
+                .availableBeds(hospital.getEmergencyId().getHvec())
+                .totalBeds(hospital.getEmergencyId().getHvs01())
+                .build();
+          })
+          .exceptionally(ex -> {
+            log.error("Exception occurred while processing hospital: {}", hospital.getHospitalId(),
+                ex);
+            return null;
+          });
+      futureList.add(future);
+    }
+
+    // 모든 비동기 작업이 완료될 때까지 대기
+    CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0])).join();
+
+    // 완료된 결과 수집
+    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
+    for (CompletableFuture<HospitalRangeDto> future : futureList) {
+      try {
+        HospitalRangeDto dto = future.get();
+        if (dto != null) {
+          rangeHospitalList.add(dto);
+        }
+      } catch (Exception e) {
+        log.warn("Failed to get HospitalRangeDto: {}", e.getMessage());
       }
     }
 
+    log.info("Completed fetching map info for all hospitals in range.");
+    long endTime = System.currentTimeMillis();  // 종료 시간
+    long duration = endTime - startTime;  // 실행 시간 계산
+    log.info("getRangeAllHospital : {} ms", duration);
     return rangeHospitalList;
   }
 
-  private List<Hospital> getRangeHospitals(Double latitude, Double longitude, int range) {
-    List<Hospital> hospitalList = hospitalRepository.findAll();
-    List<Hospital> rangeHospitalList = new ArrayList<>();
-    for (Hospital hospital : hospitalList) {
-      if(hospital.getEquipmentId()==null || hospital.getEmergencyId()==null || hospital.getIcuId()==null) continue;
-      double distance = getDistance(latitude, longitude, hospital.getLatitude(), hospital.getLongitude());
-      if (distance <= range) {
-        rangeHospitalList.add(hospital);
-      }
-    }
-    return rangeHospitalList;
-  }
-
-  private MapInfoResponseDto getMapInfo(Double latitude, Double longitude, Hospital hospital) {
-    return mapService.getMapInfo(latitude, longitude, hospital.getLatitude()
-        , hospital.getLongitude());
-  }
-
-  private Double getDistance(Double latitude, Double longitude, Double targetLat, Double targetLon) {
+  private Double getDistance(Double latitude, Double longitude, Double targetLat,
+      Double targetLon) {
     double lat1Rad = Math.toRadians(latitude);
     double lon1Rad = Math.toRadians(longitude);
     double lat2Rad = Math.toRadians(targetLat);
