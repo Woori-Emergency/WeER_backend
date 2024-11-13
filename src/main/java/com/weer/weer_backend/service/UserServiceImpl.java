@@ -52,11 +52,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void approveSignup(Long userId, boolean approve) {
+    public void approveSignup(Long userId, Approve approve) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Approve approved = approve ? Approve.APPROVED : Approve.UNAPPROVED;
 
         user = User.builder()
                 .userId(user.getUserId())
@@ -68,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 .tel(user.getTel())
                 .certificate(user.getCertificate())
                 .organization(user.getOrganization())
-                .approved(approved)
+                .approved(approve)
                 .build();
 
         userRepository.save(user); // 승인 여부 업데이트 후 저장

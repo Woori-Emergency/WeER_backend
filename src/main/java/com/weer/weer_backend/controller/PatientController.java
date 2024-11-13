@@ -4,15 +4,16 @@ import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.dto.PatientConditionDTO;
 import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
+import com.weer.weer_backend.dto.SecurityUser;
 import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
-import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.service.PatientService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,9 +68,10 @@ public class PatientController {
     }
 
     //유저별 등록된 환자 리스트
-    @GetMapping("/user/reservation/{user_id}")
+    @GetMapping("/user/reservation")
     public ResponseEntity<ApiResponse<List<PatientConditionResponseDTO>>> getPatientList(
-            @PathVariable(name = "user_id") Long userId) {
+            @AuthenticationPrincipal SecurityUser user) {
+        Long userId = user.getUser().getUserId();
         try {
             List<PatientConditionResponseDTO> patients = patientService.getPatientConditionList(userId);
             if (patients.isEmpty()) {

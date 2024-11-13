@@ -3,6 +3,7 @@ package com.weer.weer_backend.service;
 import com.weer.weer_backend.dto.UserResponseDTO;
 import com.weer.weer_backend.dto.UserUpdateDTO;
 import com.weer.weer_backend.entity.User;
+import com.weer.weer_backend.enums.Approve;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface UserService {
     List<User> getSignupRequests();
 
     // 회원가입 요청 승인/반려 처리
-    void approveSignup(Long userId, boolean approve);
+    void approveSignup(Long userId, Approve approve);
 }
