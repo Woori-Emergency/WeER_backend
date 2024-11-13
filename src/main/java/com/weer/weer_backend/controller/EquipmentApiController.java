@@ -1,5 +1,6 @@
 package com.weer.weer_backend.controller;
 
+import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.service.EquipmentApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class EquipmentApiController {
      * @return API 호출 및 데이터 저장 결과 메시지
      */
     @GetMapping("/seoul")
-    public String fetchAndSaveEquipmentInfo() {
-        return equipmentApiService.getEquipmentInfoForAllDistricts();
+    public ApiResponse<String> fetchAndSaveEquipmentInfo() {
+        return ApiResponse.success(equipmentApiService.getEquipmentInfoForAllDistricts());
     }
 }

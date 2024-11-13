@@ -5,23 +5,27 @@ import com.weer.weer_backend.dto.PatientConditionDTO;
 import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.entity.PatientCondition;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.service.PatientService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PatientController {
     private final PatientService patientService;
-    private final PatientConditionRepository patientConditionRepository;
 
-    public PatientController(PatientService patientService, PatientConditionRepository patientConditionRepository) {
+    public PatientController(PatientService patientService) {
         this.patientService = patientService;
-        this.patientConditionRepository = patientConditionRepository;
     }
 
     // 환자 상태 저장
@@ -36,11 +40,7 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(responseDTO, "환자 상태가 성공적으로 등록되었습니다."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."));
+            throw new CustomException(ErrorCode.PATIENT_SAVE_FAIL);
         }
     }
 
@@ -54,7 +54,7 @@ public class PatientController {
             return ResponseEntity.ok(ApiResponse.<List<ReservationDTO>>builder()
                     .status(HttpStatus.OK.value())
                     .message("환자의 예약 정보를 성공적으로 조회했습니다.")
-                    .data(reservations)
+                    .result(reservations)
                     .build());
 
         } catch (Exception e) {
@@ -76,13 +76,13 @@ public class PatientController {
                 return ResponseEntity.ok(ApiResponse.<List<PatientConditionResponseDTO>>builder()
                         .status(HttpStatus.NO_CONTENT.value())
                         .message("등록된 환자가 없습니다.")
-                        .data(patients)
+                        .result(patients)
                         .build());
             }
             return ResponseEntity.ok(ApiResponse.<List<PatientConditionResponseDTO>>builder()
                     .status(HttpStatus.OK.value())
                     .message("환자 목록을 성공적으로 조회했습니다.")
-                    .data(patients)
+                    .result(patients)
                     .build());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
