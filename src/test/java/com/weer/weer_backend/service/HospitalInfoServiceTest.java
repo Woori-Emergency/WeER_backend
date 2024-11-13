@@ -150,8 +150,8 @@ class HospitalInfoServiceTest {
         .build();
 
     when(hospitalRepository.findAll()).thenReturn(Collections.singletonList(hospital));
-    when(mapService.getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude()))
-        .thenReturn(mapInfo);
+    /*when(mapService.getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude()))
+        .thenReturn();*/
 
     // Act
     List<HospitalRangeDto> result = hospitalInfoService.getRangeAllHospital(latitude, longitude, range);

@@ -4,7 +4,6 @@ import com.weer.weer_backend.dto.ERAnnouncementDTO;
 import com.weer.weer_backend.dto.HospitalDTO;
 import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
-import com.weer.weer_backend.dto.MapInfoResponseDto;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
@@ -13,11 +12,13 @@ import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -122,51 +123,71 @@ public class HospitalInfoService {
     return HospitalDTO.from(hospital);
   }
 
+  @Transactional(readOnly = true)
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
+    final int METERS_IN_KILOMETER = 1000;
+    int rangeMeters = range * METERS_IN_KILOMETER;
     long startTime = System.currentTimeMillis();
+
+    // 범위 내 병원 조회
     List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
-        range * 1000);
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Get DB : {} ms", duration);
+        rangeMeters);
 
-    startTime = System.currentTimeMillis();
+    List<CompletableFuture<HospitalRangeDto>> futureList = new ArrayList<>();
 
-    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
-
+    // 각 병원에 대해 비동기적으로 지도 정보 요청
     for (Hospital hospital : rangeHospitals) {
-      if (hospital.getEquipmentId() == null || hospital.getEmergencyId() == null
+      if (hospital.getEmergencyId() == null || hospital.getEquipmentId() == null
           || hospital.getIcuId() == null) {
         continue;
       }
-      try {
-        MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
-        HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
-            .hospitalName(hospital.getName())
-            .latitude(hospital.getLatitude())
-            .longitude(hospital.getLongitude())
-            .roadDistance(mapInfo.getDistance())
-            .duration(mapInfo.getDuration())
-            .availableBeds(hospital.getEmergencyId().getHvec())
-            .totalBeds(hospital.getEmergencyId().getHvs01())
-            .build();
-        rangeHospitalList.add(hospitalRangeDto);
-      } catch (Exception e) {
-        log.warn(e.getMessage());
-      }
 
+      CompletableFuture<HospitalRangeDto> future = mapService.getMapInfo(latitude, longitude,
+              hospital.getLatitude(), hospital.getLongitude())
+          .thenApply(mapInfo -> {
+            if (mapInfo == null) {
+              log.warn("Map info is null for hospital: {}", hospital.getHospitalId());
+              return null;
+            }
+            return HospitalRangeDto.builder()
+                .hospitalName(hospital.getName())
+                .latitude(hospital.getLatitude())
+                .longitude(hospital.getLongitude())
+                .roadDistance(mapInfo.getDistance())
+                .duration(mapInfo.getDuration())
+                .availableBeds(hospital.getEmergencyId().getHvec())
+                .totalBeds(hospital.getEmergencyId().getHvs01())
+                .build();
+          })
+          .exceptionally(ex -> {
+            log.error("Exception occurred while processing hospital: {}", hospital.getHospitalId(),
+                ex);
+            return null;
+          });
+      futureList.add(future);
     }
 
-    endTime = System.currentTimeMillis();  // 종료 시간
-    duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Get Kakao API: {} ms", duration);
+    // 모든 비동기 작업이 완료될 때까지 대기
+    CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0])).join();
 
+    // 완료된 결과 수집
+    List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
+    for (CompletableFuture<HospitalRangeDto> future : futureList) {
+      try {
+        HospitalRangeDto dto = future.get();
+        if (dto != null) {
+          rangeHospitalList.add(dto);
+        }
+      } catch (Exception e) {
+        log.warn("Failed to get HospitalRangeDto: {}", e.getMessage());
+      }
+    }
+
+    log.info("Completed fetching map info for all hospitals in range.");
+    long endTime = System.currentTimeMillis();  // 종료 시간
+    long duration = endTime - startTime;  // 실행 시간 계산
+    log.info("getRangeAllHospital : {} ms", duration);
     return rangeHospitalList;
-  }
-
-  private MapInfoResponseDto getMapInfo(Double latitude, Double longitude, Hospital hospital) {
-    return mapService.getMapInfo(latitude, longitude, hospital.getLatitude()
-        , hospital.getLongitude());
   }
 
   private Double getDistance(Double latitude, Double longitude, Double targetLat,
