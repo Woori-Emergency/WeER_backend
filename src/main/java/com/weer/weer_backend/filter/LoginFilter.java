@@ -36,7 +36,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
 
-    setFilterProcessesUrl("/auth/login-process");
+    setFilterProcessesUrl("/auth/login");
   }
 
   @Override
@@ -61,15 +61,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String loginId = jsonObject.optString("loginId");
     String password = jsonObject.optString("password");
 
-    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginId,
-        password);
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginId, password);
 
-    try {
+    try{
       return authenticationManager.authenticate(authToken);
-    } catch (AuthenticationException e) {
-      log.error("로그인필터 <로그인시도> 실패 : {}", e.getMessage());
-      throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
+    } catch (AuthenticationException e){
+        try {
+            failAuthenticationWithCustomException(request, response, ErrorCode.LOGIN_CHECK_FAIL, "Wrong ID/PW");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
+  return null;
   }
 
   @Override
@@ -86,26 +89,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       Approve status = statusOptional;
       log.info("SUCCESS_AUTH_ROLE >> loginId : {}, ROLE : {}", loginId, status);
 
-      if ("PENDING" .equals(status.name())) {
-        unsuccessfulAuthentication(request, response,
-            new BadCredentialsException("Pending Account"));
-        return;
-      } else if ("UNAPPROVED" .equals(status.name())) {
-        unsuccessfulAuthentication(request, response,
-            new BadCredentialsException("Unapproved Account"));
-        return;
-      }
-
       TokenDto tokenDto = tokenProvider.generateToken(loginId, authentication);
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       response.getWriter().write(
           "{\"accessToken\":\"" + tokenDto.getAccessToken() + "\", \"refreshToken\":\""
               + tokenDto.getRefreshToken() + "\", \"grantType\":\"" + tokenDto.getGrantType()
+              + "\", \"role\":\"" + tokenDto.getRole()
               + "\"}");
       response.getWriter().flush();
 
       log.info("SUCCESS_AUTH FINISH");
-    } else {
+    }
+    else if (statusOptional.equals(Approve.PENDING)){
+      failAuthenticationWithCustomException(request, response, ErrorCode.PENDING_ACCOUNT, "Pending Account");
+      log.info("Pending Account ERROR");
+    }
+    else if (statusOptional.equals(Approve.UNAPPROVED)){
+      failAuthenticationWithCustomException(request, response, ErrorCode.UNAPPROVED_ACCOUNT, "Unapproved Account");
+      log.info("UnApproved Account ERROR");
+    }
+    else {
       log.warn("No role assigned to user: {}", loginId);
       unsuccessfulAuthentication(request, response,
           new BadCredentialsException("No Role Assigned"));
@@ -118,7 +121,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       AuthenticationException failed) throws IOException {
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType("application/json;charset=UTF-8");
-    response.setCharacterEncoding("UTF-8");
 
     Map<String, Object> errorDetails = new HashMap<>();
 
@@ -133,4 +135,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
   }
+  private void failAuthenticationWithCustomException(HttpServletRequest request, HttpServletResponse response, ErrorCode errorCode, String message) throws IOException {
+    unsuccessfulAuthentication(request, response, new BadCredentialsException(message) {
+      {
+        initCause(new CustomException(errorCode));
+      }
+    });
+  }
+
 }

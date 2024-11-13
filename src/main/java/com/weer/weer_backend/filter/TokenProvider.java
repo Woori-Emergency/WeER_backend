@@ -2,6 +2,7 @@ package com.weer.weer_backend.filter;
 
 
 import com.weer.weer_backend.dto.TokenDto;
+import com.weer.weer_backend.enums.Role;
 import com.weer.weer_backend.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -64,6 +65,7 @@ public class TokenProvider {
 
     TokenDto tokenDto = TokenDto.builder()
         .grantType("Bearer")
+        .role(role)
         .accessToken(accessToken)
         .refreshToken(refreshToken)
         .build();
