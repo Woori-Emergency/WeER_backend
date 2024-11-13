@@ -6,6 +6,8 @@ import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.dto.MapInfoResponseDto;
 import com.weer.weer_backend.entity.Hospital;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,8 +30,11 @@ public class HospitalInfoService {
 
   private static final double EARTH_RADIUS = 6371.0;
 
+  @Cacheable(value = "announce", key = "#hospitalId", unless = "#result == null")
   public List<ERAnnouncementDTO> getAnnounce(long hospitalId){
-    return erAnnouncementRepository.findAllByHospitalId(hospitalId)
+    Hospital hospital = hospitalRepository.findById(hospitalId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
+    return erAnnouncementRepository.findAllByHospitalId(hospital)
         .stream()
         .map(ERAnnouncementDTO::from)
         .collect(Collectors.toList());
@@ -45,8 +51,7 @@ public class HospitalInfoService {
   }
 
   public List<HospitalDTO> filterHospital(HospitalFilterDto filter) {
-    List<Hospital> hospitals = hospitalRepository.findByCityAndAndState(filter.getCity()
-        , filter.getState());
+    List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(), filter.getState());
 
     return hospitals.stream()
         .filter(h -> h.getIcuId()!=null || h.getEmergencyId() != null || h.getEquipmentId() != null)
@@ -91,7 +96,7 @@ public class HospitalInfoService {
         .collect(Collectors.toList());
   }
 
-
+  @Cacheable(value = "detail", key = "#hospitalId", unless = "#result == null")
   public HospitalDTO getHospitalDetail(Long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
         .orElseThrow(IllegalArgumentException::new);
