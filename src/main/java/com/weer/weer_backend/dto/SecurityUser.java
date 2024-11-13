@@ -17,7 +17,7 @@ public class SecurityUser implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(user.getApproved().toString()));  }
+    return List.of(new SimpleGrantedAuthority(user.getRole().toString()));  }
 
   @Override
   public String getPassword() {

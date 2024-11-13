@@ -1,6 +1,5 @@
 package com.weer.weer_backend.service;
 
-import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 import com.weer.weer_backend.entity.User;
 import com.weer.weer_backend.enums.Approve;
@@ -19,26 +18,7 @@ import org.springframework.stereotype.Service;
 public class LoginServiceImpl implements LoginService {
 
     private final UserRepository userRepository;
-    private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
-
-//    @Override
-//    public void authenticate(LoginForm loginForm){
-//        User user = userRepository.findByLoginId(loginForm.getLoginId())
-//            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-//
-//        if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
-//            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
-//        }
-//        if (user.getApproved() == Approve.UNAPPROVED){
-//            throw new CustomException(ErrorCode.UNAPPROVED_ACCOUNT);
-//        }
-//
-//        if (user.getApproved() == Approve.PENDING){
-//            throw new CustomException(ErrorCode.PENDING_ACCOUNT);
-//        }
-//        userDetailsService.loadUserByUsername(user.getLoginId());
-//    }
 
     @Override
     public void signUp(UserDTO userDTO) {
