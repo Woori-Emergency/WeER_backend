@@ -32,10 +32,10 @@ public class PatientController {
     // 환자 상태 저장
     @PostMapping("/hospital/patient")
     public ResponseEntity<ApiResponse<PatientConditionResponseDTO>> createPatientCondition(
-            @RequestParam Long userId,
-            @Valid @RequestBody PatientConditionDTO dto
+            @AuthenticationPrincipal SecurityUser user, @RequestBody PatientConditionDTO dto
     ) {
         try {
+            Long userId = user.getUser().getUserId();
             PatientCondition savedEntity = patientService.createPatientCondition(userId, dto);
             PatientConditionResponseDTO responseDTO = PatientConditionResponseDTO.fromEntity(savedEntity);
             return ResponseEntity.status(HttpStatus.CREATED)
