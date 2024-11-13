@@ -3,6 +3,7 @@ package com.weer.weer_backend.service;
 import com.weer.weer_backend.dto.UserResponseDTO;
 import com.weer.weer_backend.dto.UserUpdateDTO;
 import com.weer.weer_backend.entity.User;
+import com.weer.weer_backend.enums.Approve;
 import com.weer.weer_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getAllApprovedUsers() {
-        return userRepository.findByApprovedTrue().stream()
+        return userRepository.findByApproved(Approve.APPROVED).stream()
                 .map(user -> new UserResponseDTO(
                         user.getName(),
                         user.getLoginId(),
@@ -47,13 +48,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getSignupRequests() {
-        return userRepository.findByApproved(false);  // 승인 대기 중인 사용자 조회
+        return userRepository.findByApproved(Approve.PENDING);  // 승인 대기 중인 사용자 조회
     }
 
     @Override
     public void approveSignup(Long userId, boolean approve) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Approve approved = approve ? Approve.APPROVED : Approve.UNAPPROVED;
+
         user = User.builder()
                 .userId(user.getUserId())
                 .loginId(user.getLoginId())
@@ -64,7 +68,7 @@ public class UserServiceImpl implements UserService {
                 .tel(user.getTel())
                 .certificate(user.getCertificate())
                 .organization(user.getOrganization())
-                .approved(approve)
+                .approved(approved)
                 .build();
 
         userRepository.save(user); // 승인 여부 업데이트 후 저장
