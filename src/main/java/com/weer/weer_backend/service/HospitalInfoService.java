@@ -31,7 +31,7 @@ public class HospitalInfoService {
   private static final double EARTH_RADIUS = 6371.0;
 
   @Cacheable(value = "announce", key = "#hospitalId", unless = "#result == null")
-  public List<ERAnnouncementDTO> getAnnounce(long hospitalId){
+  public List<ERAnnouncementDTO> getAnnounce(long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
     return erAnnouncementRepository.findAllByHospitalId(hospital)
@@ -51,19 +51,31 @@ public class HospitalInfoService {
   }
 
   public List<HospitalDTO> filterHospital(HospitalFilterDto filter) {
-    List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(), filter.getState());
+    long startTime = System.currentTimeMillis();
+    List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(),
+        filter.getState());
+    long endTime = System.currentTimeMillis();  // 종료 시간
+    long duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Get DB : {} ms", duration);
+    startTime = System.currentTimeMillis();
 
-    return hospitals.stream()
-        .filter(this::hasEssentialIds)
-        .filter(h -> applyEmergencyFilters(h, filter))
-        .filter(h -> applyICUFilters(h, filter))
-        .filter(h -> applyEquipmentFilters(h, filter))
+    List<HospitalDTO> dtos = hospitals.parallelStream()
+        .filter(h -> hasEssentialIds(h)
+            && applyEmergencyFilters(h, filter)
+            && applyICUFilters(h, filter)
+            && applyEquipmentFilters(h, filter))
         .map(HospitalDTO::from)
         .collect(Collectors.toList());
+    endTime = System.currentTimeMillis();  // 종료 시간
+    duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Filtering : {} ms", duration);
+    return dtos;
   }
+
   private boolean hasEssentialIds(Hospital h) {
     return h.getIcuId() != null || h.getEmergencyId() != null || h.getEquipmentId() != null;
   }
+
   private boolean applyEmergencyFilters(Hospital h, HospitalFilterDto filter) {
     return (!filter.isHvec() || h.getEmergencyId().getHvec() > 0)
         && (!filter.isHv27() || h.getEmergencyId().getHv27() > 0)
@@ -73,6 +85,7 @@ public class HospitalInfoService {
         && (!filter.isHv15() || h.getEmergencyId().getHv15() > 0)
         && (!filter.isHv16() || h.getEmergencyId().getHv16() > 0);
   }
+
   private boolean applyICUFilters(Hospital h, HospitalFilterDto filter) {
     return (!filter.isHvcc() || h.getIcuId().getHvcc() > 0)
         && (!filter.isHvncc() || h.getIcuId().getHvncc() > 0)
@@ -87,6 +100,7 @@ public class HospitalInfoService {
         && (!filter.isHv34() || h.getIcuId().getHv34() > 0)
         && (!filter.isHv35() || h.getIcuId().getHv35() > 0);
   }
+
   private boolean applyEquipmentFilters(Hospital h, HospitalFilterDto filter) {
     return (!filter.isHvventiAYN() || h.getEquipmentId().getHvventiAYN())
         && (!filter.isHvventisoAYN() || h.getEquipmentId().getHvventisoAYN())
@@ -104,18 +118,28 @@ public class HospitalInfoService {
   @Cacheable(value = "detail", key = "#hospitalId", unless = "#result == null")
   public HospitalDTO getHospitalDetail(Long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
     return HospitalDTO.from(hospital);
   }
 
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
-    //List<Hospital> rangeHospitals = getRangeHospitals(latitude, longitude, range);
-    List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude, range*1000);
+    long startTime = System.currentTimeMillis();
+    List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
+        range * 1000);
+    long endTime = System.currentTimeMillis();  // 종료 시간
+    long duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Get DB : {} ms", duration);
+
+    startTime = System.currentTimeMillis();
 
     List<HospitalRangeDto> rangeHospitalList = new ArrayList<>();
 
     for (Hospital hospital : rangeHospitals) {
-      try{
+      if (hospital.getEquipmentId() == null || hospital.getEmergencyId() == null
+          || hospital.getIcuId() == null) {
+        continue;
+      }
+      try {
         MapInfoResponseDto mapInfo = getMapInfo(latitude, longitude, hospital);
         HospitalRangeDto hospitalRangeDto = HospitalRangeDto.builder()
             .hospitalName(hospital.getName())
@@ -127,25 +151,16 @@ public class HospitalInfoService {
             .totalBeds(hospital.getEmergencyId().getHvs01())
             .build();
         rangeHospitalList.add(hospitalRangeDto);
-      }catch (Exception e){
+      } catch (Exception e) {
         log.warn(e.getMessage());
       }
 
     }
 
-    return rangeHospitalList;
-  }
+    endTime = System.currentTimeMillis();  // 종료 시간
+    duration = endTime - startTime;  // 실행 시간 계산
+    log.info("Get Kakao API: {} ms", duration);
 
-  private List<Hospital> getRangeHospitals(Double latitude, Double longitude, int range) {
-    List<Hospital> hospitalList = hospitalRepository.findAll();
-    List<Hospital> rangeHospitalList = new ArrayList<>();
-    for (Hospital hospital : hospitalList) {
-      if(hospital.getEquipmentId()==null || hospital.getEmergencyId()==null || hospital.getIcuId()==null) continue;
-      double distance = getDistance(latitude, longitude, hospital.getLatitude(), hospital.getLongitude());
-      if (distance <= range) {
-        rangeHospitalList.add(hospital);
-      }
-    }
     return rangeHospitalList;
   }
 
@@ -154,7 +169,8 @@ public class HospitalInfoService {
         , hospital.getLongitude());
   }
 
-  private Double getDistance(Double latitude, Double longitude, Double targetLat, Double targetLon) {
+  private Double getDistance(Double latitude, Double longitude, Double targetLat,
+      Double targetLon) {
     double lat1Rad = Math.toRadians(latitude);
     double lon1Rad = Math.toRadians(longitude);
     double lat2Rad = Math.toRadians(targetLat);
