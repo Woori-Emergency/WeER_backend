@@ -24,11 +24,6 @@ public class LoginController {
 
     private final LoginService loginService;
 
-//    @PostMapping("/login")
-//    public void login(@RequestBody LoginForm loginForm) throws Exception {
-//        loginService.authenticate(loginForm);
-//    }
-
     @PostMapping("/signup")
     public ApiResponse<String> signup(@RequestBody UserDTO userDTO){
         loginService.signUp(userDTO);
