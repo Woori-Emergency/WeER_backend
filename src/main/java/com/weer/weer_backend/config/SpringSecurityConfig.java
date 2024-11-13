@@ -41,7 +41,7 @@ public class SpringSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers("/api/**","/auth/**","swagger-ui/**","/v3/api-docs/**").permitAll()
+                    .requestMatchers("/api/**","/auth/**","swagger-ui/**","/v3/api-docs/**","**").permitAll()
                     .anyRequest().authenticated())
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint((request, response, authException) -> {
