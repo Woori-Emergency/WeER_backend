@@ -26,6 +26,7 @@ public enum ErrorCode {
 
   //Patient
   PATIENT_SAVE_FAIL(HttpStatus.BAD_REQUEST,"환자 상태 저장에 실패했습니다."),
+  PATIENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "환자 정보가 존재하지 않습니다."),
 
   //locationInfo
   NOT_FOUND_ROUTE(HttpStatus.BAD_REQUEST,"경로를 찾을 수 없습니다.");
