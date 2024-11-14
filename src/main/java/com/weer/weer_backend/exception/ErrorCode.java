@@ -19,6 +19,7 @@ public enum ErrorCode {
 
   // SignUp
   DATABASE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "회원정보 DB 저장에 실패하였습니다."),
+  DUPLICATED_SIGNUP(HttpStatus.BAD_REQUEST, "중복된 정보가 존재합니다."),
 
   //Hospital
   NOT_FOUND_HOSPITAL(HttpStatus.BAD_REQUEST, "해당하는 병원을 찾을 수 없습니다."),
