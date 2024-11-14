@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface PatientConditionRepository extends JpaRepository<PatientCondition, Long>{
     List<PatientCondition> findAllByUserId(Long userId);
+
+    List<PatientCondition> findAllByPatientconditionidIn(List<Long> patientconditionIds);
 }

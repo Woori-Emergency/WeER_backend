@@ -1,13 +1,18 @@
 package com.weer.weer_backend.service;
 
+import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.dto.ReservationRequestDto;
+import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
+import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.repository.ReservationRepository;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
@@ -16,7 +21,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-
+    private final PatientConditionRepository patientConditionRepository;
     // 병원에서 승인
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -58,5 +63,13 @@ public class ReservationService {
         }catch (Exception e){
             return e.getMessage();
         }
+    }
+
+    // 환자들의 건강 정보 리스트
+    public List<PatientConditionResponseDTO> getPatientConditionList(List<Long> patientsConditionId) {
+        List<PatientCondition> patientConditions = patientConditionRepository.findAllByPatientconditionidIn(patientsConditionId);
+        return patientConditions.stream()
+                .map(PatientConditionResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }
