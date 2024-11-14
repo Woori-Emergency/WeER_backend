@@ -5,10 +5,14 @@ import com.weer.weer_backend.entity.Equipment;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.entity.Icu;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class HospitalDTO {
     private Long hospitalId;
