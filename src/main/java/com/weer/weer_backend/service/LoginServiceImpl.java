@@ -22,6 +22,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void signUp(UserDTO userDTO) {
+        if(userRepository.existsByEmail(userDTO.getEmail())||userRepository.existsByLoginId(userDTO.getLoginId())){
+            throw new CustomException(ErrorCode.DUPLICATED_SIGNUP);
+        }
         User user = User.builder()
                 .loginId(userDTO.getLoginId())
                 .name(userDTO.getName())

@@ -39,7 +39,7 @@ public class LoginController {
         return ApiResponse.success("logout success");
     }
 
-    // 비동기식 ID 중복체크
+    // 비동기식 ID 중복체크"
     @GetMapping("/check-login-id")
     public ApiResponse<Boolean> checkLoginId(@RequestParam String loginId) throws Exception{
         return ApiResponse.success(loginService.isLoginIdDuplicate(loginId));
@@ -50,7 +50,5 @@ public class LoginController {
     public ApiResponse<Boolean> checkEmail(@RequestParam String email) {
         return ApiResponse.success(loginService.isEmailDuplicate(email));
     }
-
-
 }
 
