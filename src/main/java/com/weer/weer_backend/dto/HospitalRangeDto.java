@@ -1,5 +1,6 @@
 package com.weer.weer_backend.dto;
 
+import com.weer.weer_backend.entity.Hospital;
 import lombok.Builder;
 import lombok.Getter;
 
