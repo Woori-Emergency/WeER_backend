@@ -12,16 +12,14 @@ import org.springframework.stereotype.Repository;
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     // 병원 관련 추가 메서드 정의 가능
     List<Hospital> findByCityAndState(String city, String state);
-    boolean existsByHpid(String hpid); // hpid로 중복 여부 확인
     Optional<Hospital> findByHpid(String hpid);
 
     @Query("SELECT h FROM Hospital h WHERE " +
-        "ST_Distance_Sphere(POINT(:longitude, :latitude), POINT(h.longitude, h.latitude)) <= :range")
+        "ST_Distance_Sphere(POINT(:longitude, :latitude), POINT(h.longitude, h.latitude)) <= :range " +
+        "ORDER BY ST_Distance_Sphere(POINT(:longitude, :latitude), POINT(h.longitude, h.latitude)) ASC")
     List<Hospital> findRangeHospital(@Param("latitude") Double latitude,
         @Param("longitude") Double longitude,
         @Param("range") double range);
-
-
 
 
 }

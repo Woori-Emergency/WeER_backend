@@ -27,45 +27,36 @@ public class HospitalInfoController {
   @GetMapping("/announcement")
   public ApiResponse<List<ERAnnouncementDTO>> getAnnouncement(
       @RequestParam(name = "hospitalid") Long hospitalId) {
-    long startTime = System.currentTimeMillis();
     List<ERAnnouncementDTO> response = hospitalInfoService.getAnnounce(hospitalId);
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Execution time of getAnnounce: {} ms", duration);
     return ApiResponse.success(response);
   }
 
   @PostMapping("/info")
   public ApiResponse<List<HospitalDTO>> filterHospital(@RequestParam Double lat
       , @RequestParam Double lon, @RequestBody HospitalFilterDto filter) {
-    long startTime = System.currentTimeMillis();
     List<HospitalDTO> response = hospitalInfoService.filteredHospitals(lat, lon, filter);
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Execution time of getFilterHospital : {} ms", duration);
+    return ApiResponse.success(response);
+  }
+
+  @PostMapping("/distance")
+  public ApiResponse<List<HospitalDTO>> distanceHospital(@RequestParam Double lat
+      , @RequestParam Double lon, @RequestParam int range) {
+    List<HospitalDTO> response = hospitalInfoService.getDistanceAllHospital(lat, lon, range);
     return ApiResponse.success(response);
   }
 
   @GetMapping("/location")
   public ApiResponse<List<HospitalRangeDto>> getHospitalLocation(@RequestParam Double lat
       , @RequestParam Double lon, @RequestParam Integer range) {
-    long startTime = System.currentTimeMillis();
     List<HospitalRangeDto> response =
         hospitalInfoService.getRangeAllHospital(lat, lon, range);
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Execution time of getHospitalLocation : {} ms", duration);
     return ApiResponse.success(response);
   }
 
   @GetMapping("/detail")
   public ApiResponse<HospitalDTO> getHospitalDetail(
       @RequestParam(name = "hospitalid") Long hospitalId) {
-    long startTime = System.currentTimeMillis();
     HospitalDTO response = hospitalInfoService.getHospitalDetail(hospitalId);
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Execution time of getHospitalDetail : {} ms", duration);
     return ApiResponse.success(response);
   }
 }
