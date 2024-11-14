@@ -52,25 +52,16 @@ public class HospitalInfoService {
   }
 
   public List<HospitalDTO> filterHospital(HospitalFilterDto filter) {
-    long startTime = System.currentTimeMillis();
     List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(),
         filter.getState());
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Get DB : {} ms", duration);
-    startTime = System.currentTimeMillis();
 
-    List<HospitalDTO> dtos = hospitals.parallelStream()
+    return hospitals.parallelStream()
         .filter(h -> hasEssentialIds(h)
             && applyEmergencyFilters(h, filter)
             && applyICUFilters(h, filter)
             && applyEquipmentFilters(h, filter))
         .map(HospitalDTO::from)
         .collect(Collectors.toList());
-    endTime = System.currentTimeMillis();  // 종료 시간
-    duration = endTime - startTime;  // 실행 시간 계산
-    log.info("Filtering : {} ms", duration);
-    return dtos;
   }
 
   private boolean hasEssentialIds(Hospital h) {
@@ -123,11 +114,24 @@ public class HospitalInfoService {
     return HospitalDTO.from(hospital);
   }
 
+  public List<HospitalDTO> getDistanceAllHospital(Double latitude, Double longitude, int range) {
+    final int METERS_IN_KILOMETER = 1000;
+    int rangeMeters = range * METERS_IN_KILOMETER;
+
+    // 범위 내 병원 조회
+    List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
+        rangeMeters);
+    return rangeHospitals.stream()
+        .filter(
+            h -> h.getIcuId() != null && h.getEmergencyId() != null && h.getEquipmentId() != null)
+        .map(HospitalDTO::from)
+        .collect(Collectors.toList());
+  }
+
   @Transactional(readOnly = true)
   public List<HospitalRangeDto> getRangeAllHospital(Double latitude, Double longitude, int range) {
     final int METERS_IN_KILOMETER = 1000;
     int rangeMeters = range * METERS_IN_KILOMETER;
-    long startTime = System.currentTimeMillis();
 
     // 범위 내 병원 조회
     List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
@@ -184,9 +188,6 @@ public class HospitalInfoService {
     }
 
     log.info("Completed fetching map info for all hospitals in range.");
-    long endTime = System.currentTimeMillis();  // 종료 시간
-    long duration = endTime - startTime;  // 실행 시간 계산
-    log.info("getRangeAllHospital : {} ms", duration);
     return rangeHospitalList;
   }
 
