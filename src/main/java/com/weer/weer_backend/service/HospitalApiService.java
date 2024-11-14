@@ -6,6 +6,14 @@ import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,19 +22,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-
+@Slf4j
 @Service
 public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
     private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
+    private long start;
+    private final List<String> districts = DistrictConstants.DISTRICTS;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -34,12 +37,11 @@ public class HospitalApiService {
     @Autowired
     private HospitalRepository hospitalRepository;
 
-    private final List<String> districts = DistrictConstants.DISTRICTS;
-
     // 애플리케이션 시작 시 한 번 실행되는 메서드
     @PostConstruct
     public void init() {
         System.out.println("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
+        start = System.currentTimeMillis();
         getHospitalInfoForAllDistricts();
     }
 
@@ -51,8 +53,11 @@ public class HospitalApiService {
         for (String stage2 : districts) {
             getHospitalInfoAndSave(stage1, stage2, pageNo, numOfRows);
         }
+        long end = System.currentTimeMillis();
+        long duration = end - start;
+        log.info("duration: " + duration);
     }
-
+    
     public String getHospitalInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
         URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
                 .queryParam("serviceKey", SERVICE_KEY)

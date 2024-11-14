@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,6 @@ public class HospitalInfoService {
 
   private static final double EARTH_RADIUS = 6371.0;
 
-  @Cacheable(value = "announce", key = "#hospitalId", unless = "#result == null")
   public List<ERAnnouncementDTO> getAnnounce(long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
@@ -101,8 +99,6 @@ public class HospitalInfoService {
         && (!filter.isHvangioAYN() || h.getEquipmentId().getHvangioAYN());
   }
 
-
-  @Cacheable(value = "detail", key = "#hospitalId", unless = "#result == null")
   public HospitalDTO getHospitalDetail(Long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
