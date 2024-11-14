@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +43,30 @@ public class PatientController {
                     .body(ApiResponse.success(responseDTO, "환자 상태가 성공적으로 등록되었습니다."));
         } catch (IllegalArgumentException e) {
             throw new CustomException(ErrorCode.PATIENT_SAVE_FAIL);
+        }
+    }
+
+    // 환자의 transportStatus를 COMPLETED로 업데이트하는 엔드포인트
+    @PatchMapping("/hospital/patient/{patient_id}/complete")
+    public ResponseEntity<ApiResponse<PatientConditionResponseDTO>> completePatientTransportStatus(
+            @PathVariable(name = "patient_id") Long patientId) {
+        try {
+            PatientCondition updatedCondition = patientService.updatePatientTransportStatusToCompleted(patientId);
+            PatientConditionResponseDTO responseDTO = PatientConditionResponseDTO.fromEntity(updatedCondition);
+
+            return ResponseEntity.ok(ApiResponse.success(responseDTO, "환자 이송 상태가 COMPLETED로 업데이트되었습니다."));
+        } catch (CustomException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.<PatientConditionResponseDTO>builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message("해당 환자를 찾을 수 없습니다.")
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<PatientConditionResponseDTO>builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("환자 이송 상태 업데이트 중 오류가 발생했습니다.")
+                            .build());
         }
     }
 

@@ -5,15 +5,18 @@ import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.entity.Reservation;
+import com.weer.weer_backend.enums.TransportStatus;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
@@ -38,20 +41,33 @@ public class PatientService {
         }
     }
 
+    // 환자의 transportStatus를 COMPLETED로 업데이트
+    @Transactional
+    public PatientCondition updatePatientTransportStatusToCompleted(Long patientId) {
+        PatientCondition patientCondition = patientConditionRepository.findById(patientId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PATIENT_NOT_FOUND));
+
+        // 기존 객체를 toBuilder로 복사하고 transportStatus만 변경
+        PatientCondition updatedCondition = patientCondition.toBuilder()
+                .transportStatus(TransportStatus.COMPLETED)  // 상태를 COMPLETED로 변경
+                .build();
+
+        return patientConditionRepository.save(updatedCondition);
+    }
+
     // 환자별 예약 정보 리스트 가져오기
     public List<ReservationDTO> getPatientReservationList(Long patientId) {
         List<Reservation> reservations = reservationRepository.findAllByPatientconditionid(patientId);
         return reservations.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-
     }
 
     // 유저별 등록된 환자 정보 가져오기
     public List<PatientConditionResponseDTO> getPatientConditionList(Long userId) {
         List<PatientCondition> patientConditions = patientConditionRepository.findAllByUserId(userId);
         return patientConditions.stream()
-                .map(PatientConditionResponseDTO::fromEntity)  // 정적 메서드 참조로 변경
+                .map(PatientConditionResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -64,5 +80,4 @@ public class PatientService {
                 .modifiedAt(reservation.getModifiedAt())
                 .build();
     }
-
 }

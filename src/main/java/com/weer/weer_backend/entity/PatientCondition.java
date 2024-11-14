@@ -6,13 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "PATIENT_CONDITION")
+@DynamicUpdate
 public class PatientCondition extends BaseEntity {
 
     @Id
