@@ -3,6 +3,7 @@ package com.weer.weer_backend.controller;
 import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.dto.ERAnnouncementDTO;
 import com.weer.weer_backend.dto.HospitalDTO;
+import com.weer.weer_backend.dto.HospitalDistanceDto;
 import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.service.HospitalInfoService;
@@ -32,16 +33,16 @@ public class HospitalInfoController {
   }
 
   @PostMapping("/info")
-  public ApiResponse<List<HospitalDTO>> filterHospital(@RequestParam Double lat
+  public ApiResponse<List<HospitalDistanceDto>> filterHospital(@RequestParam Double lat
       , @RequestParam Double lon, @RequestBody HospitalFilterDto filter) {
-    List<HospitalDTO> response = hospitalInfoService.filteredHospitals(lat, lon, filter);
+    List<HospitalDistanceDto> response = hospitalInfoService.filteredHospitals(lat, lon, filter);
     return ApiResponse.success(response);
   }
 
   @PostMapping("/distance")
-  public ApiResponse<List<HospitalDTO>> distanceHospital(@RequestParam Double lat
+  public ApiResponse<List<HospitalDistanceDto>> distanceHospital(@RequestParam Double lat
       , @RequestParam Double lon, @RequestParam int range) {
-    List<HospitalDTO> response = hospitalInfoService.getDistanceAllHospital(lat, lon, range);
+    List<HospitalDistanceDto> response = hospitalInfoService.getDistanceAllHospital(lat, lon, range);
     return ApiResponse.success(response);
   }
 

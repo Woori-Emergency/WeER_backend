@@ -2,6 +2,7 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.dto.ERAnnouncementDTO;
 import com.weer.weer_backend.dto.HospitalDTO;
+import com.weer.weer_backend.dto.HospitalDistanceDto;
 import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.entity.Hospital;
@@ -10,7 +11,6 @@ import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -41,17 +41,14 @@ public class HospitalInfoService {
         .collect(Collectors.toList());
   }
 
-  public List<HospitalDTO> filteredHospitals(Double latitude, Double longitude
+  public List<HospitalDistanceDto> filteredHospitals(Double latitude, Double longitude
       , HospitalFilterDto hospitalFilterDto) {
-    List<HospitalDTO> hospitalDTOS = filterHospital(hospitalFilterDto);
+    List<Hospital> hospitals = filterHospital(hospitalFilterDto);
 
-    hospitalDTOS.sort(Comparator.comparingDouble(h ->
-        getDistance(latitude, longitude, h.getLatitude(), h.getLongitude())));
-
-    return hospitalDTOS;
+    return getDistanceAndTimeHospitals(hospitals, latitude, longitude);
   }
 
-  public List<HospitalDTO> filterHospital(HospitalFilterDto filter) {
+  private List<Hospital> filterHospital(HospitalFilterDto filter) {
     List<Hospital> hospitals = hospitalRepository.findByCityAndState(filter.getCity(),
         filter.getState());
 
@@ -59,9 +56,7 @@ public class HospitalInfoService {
         .filter(h -> hasEssentialIds(h)
             && applyEmergencyFilters(h, filter)
             && applyICUFilters(h, filter)
-            && applyEquipmentFilters(h, filter))
-        .map(HospitalDTO::from)
-        .collect(Collectors.toList());
+            && applyEquipmentFilters(h, filter)).toList();
   }
 
   private boolean hasEssentialIds(Hospital h) {
@@ -114,18 +109,62 @@ public class HospitalInfoService {
     return HospitalDTO.from(hospital);
   }
 
-  public List<HospitalDTO> getDistanceAllHospital(Double latitude, Double longitude, int range) {
+  public List<HospitalDistanceDto> getDistanceAllHospital(Double latitude, Double longitude, int range) {
     final int METERS_IN_KILOMETER = 1000;
     int rangeMeters = range * METERS_IN_KILOMETER;
 
     // 범위 내 병원 조회
     List<Hospital> rangeHospitals = hospitalRepository.findRangeHospital(latitude, longitude,
         rangeMeters);
-    return rangeHospitals.stream()
-        .filter(
-            h -> h.getIcuId() != null && h.getEmergencyId() != null && h.getEquipmentId() != null)
-        .map(HospitalDTO::from)
-        .collect(Collectors.toList());
+    return getDistanceAndTimeHospitals(rangeHospitals, latitude, longitude);
+  }
+
+  private List<HospitalDistanceDto> getDistanceAndTimeHospitals(List<Hospital> hospitals,
+      Double latitude, Double longitude) {
+    List<CompletableFuture<HospitalDistanceDto>> futureList = new ArrayList<>();
+
+    // 각 병원에 대해 비동기적으로 지도 정보 요청
+    for (Hospital hospital : hospitals) {
+      if (hospital.getEmergencyId() == null || hospital.getEquipmentId() == null
+          || hospital.getIcuId() == null) {
+        continue;
+      }
+
+      CompletableFuture<HospitalDistanceDto> future = mapService.getMapInfo(latitude, longitude,
+              hospital.getLatitude(), hospital.getLongitude())
+          .thenApply(mapInfo -> {
+            if (mapInfo == null) {
+              log.warn("Map info is null for hospital: {}", hospital.getHospitalId());
+              return null;
+            }
+            return HospitalDistanceDto.from(hospital, mapInfo.getDistance(), mapInfo.getDuration());
+          })
+          .exceptionally(ex -> {
+            log.error("Exception occurred while processing hospital: {}", hospital.getHospitalId(),
+                ex);
+            return null;
+          });
+      futureList.add(future);
+    }
+
+    // 모든 비동기 작업이 완료될 때까지 대기
+    CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0])).join();
+
+    // 완료된 결과 수집
+    List<HospitalDistanceDto> rangeHospitalList = new ArrayList<>();
+    for (CompletableFuture<HospitalDistanceDto> future : futureList) {
+      try {
+        HospitalDistanceDto dto = future.get();
+        if (dto != null) {
+          rangeHospitalList.add(dto);
+        }
+      } catch (Exception e) {
+        log.warn("Failed to get HospitalDistanceDto: {}", e.getMessage());
+      }
+    }
+
+    log.info("Completed fetching map info for all hospitals in range.");
+    return rangeHospitalList;
   }
 
   @Transactional(readOnly = true)
