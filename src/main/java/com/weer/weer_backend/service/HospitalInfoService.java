@@ -62,42 +62,71 @@ public class HospitalInfoService {
     return h.getIcuId() != null || h.getEmergencyId() != null || h.getEquipmentId() != null;
   }
 
-  private boolean applyEmergencyFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvec() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHvec() > 0).orElse(false))
-        && (!filter.isHv27() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv27() > 0).orElse(false))
-        && (!filter.isHv29() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv29() > 0).orElse(false))
-        && (!filter.isHv30() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv30() > 0).orElse(false))
-        && (!filter.isHv28() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv28() > 0).orElse(false))
-        && (!filter.isHv15() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv15() > 0).orElse(false))
-        && (!filter.isHv16() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv16() > 0).orElse(false));
+  private boolean applyEmergencyFilters(Hospital hospital, HospitalFilterDto filter) {
+    return (!filter.isHvec() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHvec() != null && emergency.getHvec() > 0).orElse(false))
+        && (!filter.isHv27() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv27() != null && emergency.getHv27() > 0).orElse(false))
+        && (!filter.isHv29() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv29() != null && emergency.getHv29() > 0).orElse(false))
+        && (!filter.isHv30() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv30() != null && emergency.getHv30() > 0).orElse(false))
+        && (!filter.isHv28() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv28() != null && emergency.getHv28() > 0).orElse(false))
+        && (!filter.isHv15() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv15() != null && emergency.getHv15() > 0).orElse(false))
+        && (!filter.isHv16() || Optional.ofNullable(hospital.getEmergencyId())
+        .map(emergency -> emergency.getHv16() != null && emergency.getHv16() > 0).orElse(false));
   }
 
-  private boolean applyICUFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvcc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvcc() > 0).orElse(false))
-        && (!filter.isHvncc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvncc() > 0).orElse(false))
-        && (!filter.isHvccc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvccc() > 0).orElse(false))
-        && (!filter.isHvicc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvicc() > 0).orElse(false))
-        && (!filter.isHv2() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv2() > 0).orElse(false))
-        && (!filter.isHv3() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv3() > 0).orElse(false))
-        && (!filter.isHv6() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv6() > 0).orElse(false))
-        && (!filter.isHv8() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv8() > 0).orElse(false))
-        && (!filter.isHv9() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv9() > 0).orElse(false))
-        && (!filter.isHv32() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv32() > 0).orElse(false))
-        && (!filter.isHv34() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv34() > 0).orElse(false))
-        && (!filter.isHv35() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv35() > 0).orElse(false));
+  private boolean applyICUFilters(Hospital hospital, HospitalFilterDto filter) {
+    return (!filter.isHvcc() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHvcc() != null && icu.getHvcc() > 0).orElse(false))
+        && (!filter.isHvncc() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHvncc() != null && icu.getHvncc() > 0).orElse(false))
+        && (!filter.isHvccc() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHvccc() != null && icu.getHvccc() > 0).orElse(false))
+        && (!filter.isHvicc() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHvicc() != null && icu.getHvicc() > 0).orElse(false))
+        && (!filter.isHv2() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv2() != null && icu.getHv2() > 0).orElse(false))
+        && (!filter.isHv3() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv3() != null && icu.getHv3() > 0).orElse(false))
+        && (!filter.isHv6() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv6() != null && icu.getHv6() > 0).orElse(false))
+        && (!filter.isHv8() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv8() != null && icu.getHv8() > 0).orElse(false))
+        && (!filter.isHv9() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv9() != null && icu.getHv9() > 0).orElse(false))
+        && (!filter.isHv32() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv32() != null && icu.getHv32() > 0).orElse(false))
+        && (!filter.isHv34() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv34() != null && icu.getHv34() > 0).orElse(false))
+        && (!filter.isHv35() || Optional.ofNullable(hospital.getIcuId())
+        .map(icu -> icu.getHv35() != null && icu.getHv35() > 0).orElse(false));
   }
 
-  private boolean applyEquipmentFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvventiAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvventiAYN()).orElse(false))
-        && (!filter.isHvventisoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvventisoAYN()).orElse(false))
-        && (!filter.isHvinCUAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvinCUAYN()).orElse(false))
-        && (!filter.isHvcrrTAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvcrrTAYN()).orElse(false))
-        && (!filter.isHvecmoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvecmoAYN()).orElse(false))
-        && (!filter.isHvhypoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvhypoAYN()).orElse(false))
-        && (!filter.isHvoxyAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvoxyAYN()).orElse(false))
-        && (!filter.isHvctAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvctAYN()).orElse(false))
-        && (!filter.isHvmriAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvmriAYN()).orElse(false))
-        && (!filter.isHvangioAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvangioAYN()).orElse(false));
+  private boolean applyEquipmentFilters(Hospital hospital, HospitalFilterDto filter) {
+    return (!filter.isHvventiAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvventiAYN())).orElse(false))
+        && (!filter.isHvventisoAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvventisoAYN())).orElse(false))
+        && (!filter.isHvinCUAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvinCUAYN())).orElse(false))
+        && (!filter.isHvcrrTAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvcrrTAYN())).orElse(false))
+        && (!filter.isHvecmoAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvecmoAYN())).orElse(false))
+        && (!filter.isHvhypoAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvhypoAYN())).orElse(false))
+        && (!filter.isHvoxyAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvoxyAYN())).orElse(false))
+        && (!filter.isHvctAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvctAYN())).orElse(false))
+        && (!filter.isHvmriAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvmriAYN())).orElse(false))
+        && (!filter.isHvangioAYN() || Optional.ofNullable(hospital.getEquipmentId())
+        .map(equipment -> Boolean.TRUE.equals(equipment.getHvangioAYN())).orElse(false));
   }
 
 
@@ -107,7 +136,8 @@ public class HospitalInfoService {
     return HospitalDTO.from(hospital);
   }
 
-  public List<HospitalDistanceDto> getDistanceAllHospital(Double latitude, Double longitude, int range) {
+  public List<HospitalDistanceDto> getDistanceAllHospital(Double latitude, Double longitude,
+      int range) {
     final int METERS_IN_KILOMETER = 1000;
     int rangeMeters = range * METERS_IN_KILOMETER;
 
