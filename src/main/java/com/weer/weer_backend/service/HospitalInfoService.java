@@ -12,6 +12,7 @@ import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -62,42 +63,43 @@ public class HospitalInfoService {
   }
 
   private boolean applyEmergencyFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvec() || h.getEmergencyId().getHvec() > 0)
-        && (!filter.isHv27() || h.getEmergencyId().getHv27() > 0)
-        && (!filter.isHv29() || h.getEmergencyId().getHv29() > 0)
-        && (!filter.isHv30() || h.getEmergencyId().getHv30() > 0)
-        && (!filter.isHv28() || h.getEmergencyId().getHv28() > 0)
-        && (!filter.isHv15() || h.getEmergencyId().getHv15() > 0)
-        && (!filter.isHv16() || h.getEmergencyId().getHv16() > 0);
+    return (!filter.isHvec() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHvec() > 0).orElse(false))
+        && (!filter.isHv27() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv27() > 0).orElse(false))
+        && (!filter.isHv29() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv29() > 0).orElse(false))
+        && (!filter.isHv30() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv30() > 0).orElse(false))
+        && (!filter.isHv28() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv28() > 0).orElse(false))
+        && (!filter.isHv15() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv15() > 0).orElse(false))
+        && (!filter.isHv16() || Optional.ofNullable(h.getEmergencyId()).map(e -> e.getHv16() > 0).orElse(false));
   }
 
   private boolean applyICUFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvcc() || h.getIcuId().getHvcc() > 0)
-        && (!filter.isHvncc() || h.getIcuId().getHvncc() > 0)
-        && (!filter.isHvccc() || h.getIcuId().getHvccc() > 0)
-        && (!filter.isHvicc() || h.getIcuId().getHvicc() > 0)
-        && (!filter.isHv2() || h.getIcuId().getHv2() > 0)
-        && (!filter.isHv3() || h.getIcuId().getHv3() > 0)
-        && (!filter.isHv6() || h.getIcuId().getHv6() > 0)
-        && (!filter.isHv8() || h.getIcuId().getHv8() > 0)
-        && (!filter.isHv9() || h.getIcuId().getHv9() > 0)
-        && (!filter.isHv32() || h.getIcuId().getHv32() > 0)
-        && (!filter.isHv34() || h.getIcuId().getHv34() > 0)
-        && (!filter.isHv35() || h.getIcuId().getHv35() > 0);
+    return (!filter.isHvcc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvcc() > 0).orElse(false))
+        && (!filter.isHvncc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvncc() > 0).orElse(false))
+        && (!filter.isHvccc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvccc() > 0).orElse(false))
+        && (!filter.isHvicc() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHvicc() > 0).orElse(false))
+        && (!filter.isHv2() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv2() > 0).orElse(false))
+        && (!filter.isHv3() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv3() > 0).orElse(false))
+        && (!filter.isHv6() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv6() > 0).orElse(false))
+        && (!filter.isHv8() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv8() > 0).orElse(false))
+        && (!filter.isHv9() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv9() > 0).orElse(false))
+        && (!filter.isHv32() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv32() > 0).orElse(false))
+        && (!filter.isHv34() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv34() > 0).orElse(false))
+        && (!filter.isHv35() || Optional.ofNullable(h.getIcuId()).map(icu -> icu.getHv35() > 0).orElse(false));
   }
 
   private boolean applyEquipmentFilters(Hospital h, HospitalFilterDto filter) {
-    return (!filter.isHvventiAYN() || h.getEquipmentId().getHvventiAYN())
-        && (!filter.isHvventisoAYN() || h.getEquipmentId().getHvventisoAYN())
-        && (!filter.isHvinCUAYN() || h.getEquipmentId().getHvinCUAYN())
-        && (!filter.isHvcrrTAYN() || h.getEquipmentId().getHvcrrTAYN())
-        && (!filter.isHvecmoAYN() || h.getEquipmentId().getHvecmoAYN())
-        && (!filter.isHvhypoAYN() || h.getEquipmentId().getHvhypoAYN())
-        && (!filter.isHvoxyAYN() || h.getEquipmentId().getHvoxyAYN())
-        && (!filter.isHvctAYN() || h.getEquipmentId().getHvctAYN())
-        && (!filter.isHvmriAYN() || h.getEquipmentId().getHvmriAYN())
-        && (!filter.isHvangioAYN() || h.getEquipmentId().getHvangioAYN());
+    return (!filter.isHvventiAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvventiAYN()).orElse(false))
+        && (!filter.isHvventisoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvventisoAYN()).orElse(false))
+        && (!filter.isHvinCUAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvinCUAYN()).orElse(false))
+        && (!filter.isHvcrrTAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvcrrTAYN()).orElse(false))
+        && (!filter.isHvecmoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvecmoAYN()).orElse(false))
+        && (!filter.isHvhypoAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvhypoAYN()).orElse(false))
+        && (!filter.isHvoxyAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvoxyAYN()).orElse(false))
+        && (!filter.isHvctAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvctAYN()).orElse(false))
+        && (!filter.isHvmriAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvmriAYN()).orElse(false))
+        && (!filter.isHvangioAYN() || Optional.ofNullable(h.getEquipmentId()).map(equip -> equip.getHvangioAYN()).orElse(false));
   }
+
 
   public HospitalDTO getHospitalDetail(Long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)

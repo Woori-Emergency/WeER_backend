@@ -8,13 +8,10 @@ import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
 import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.repository.ReservationRepository;
-import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,7 +21,6 @@ public class ReservationService {
     private final PatientConditionRepository patientConditionRepository;
     // 병원에서 승인
     @Transactional
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void reservationApprove(ReservationDTO reservationDTO) {
         Reservation reservation = reservationRepository.findByReservationId(reservationDTO.getReservationId());
         List<Reservation> reservationList = reservationRepository.findAllByPatientconditionid(

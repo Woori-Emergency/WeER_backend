@@ -1,23 +1,20 @@
 version: '3.8'
+
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Prometheus 설정 파일
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     container_name: grafana
-    ports:
-      - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin  # 기본 로그인 비밀번호 설정
-      - GF_SECURITY_ALLOW_EMBEDDING=true  # iframe 임베딩 허용
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
     depends_on:
       - prometheus
-
-volumes:
-  grafana-data:
+    ports:
+      - "3000:3000"
