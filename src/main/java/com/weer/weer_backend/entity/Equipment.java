@@ -46,7 +46,7 @@ public class Equipment extends BaseEntity {
     @Column(name = "HVECMOAYN")
     private Boolean hvecmoAYN;  // ECMO (체외막 산소공급 장치) 사용 가능 여부
 
-    @Column(name = "HVHYPHOAYN")
+    @Column(name = "HVHYPOAYN")
     private Boolean hvhypoAYN;  // 중심체온조절 장치 사용 가능 여부
 
     @Column(name = "HVOXYAYN")
