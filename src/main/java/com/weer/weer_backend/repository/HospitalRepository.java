@@ -11,7 +11,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     // 병원 관련 추가 메서드 정의 가능
-    List<Hospital> findByCityAndState(String city, String state);
+    @Query("SELECT h FROM Hospital h " +
+        "JOIN FETCH h.equipmentId " +
+        "JOIN FETCH h.icuId " +
+        "JOIN FETCH h.emergencyId " +
+        "WHERE h.city = :city AND h.state = :state")
+    List<Hospital> findByCityAndState(@Param("city") String city, @Param("state") String state);
     Optional<Hospital> findByHpid(String hpid);
 
     @Query("SELECT h FROM Hospital h WHERE " +

@@ -27,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
+
   private final AuthenticationConfiguration authenticationConfiguration;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final TokenProvider tokenProvider;
@@ -40,7 +41,8 @@ public class SpringSecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/**", "/auth/**", "swagger-ui/**", "/v3/api-docs/**", "**").permitAll()
+            .requestMatchers("/api/**", "/auth/**", "swagger-ui/**", "/v3/api-docs/**",
+                "/actuator/prometheus", "**").permitAll()
             .anyRequest().authenticated())
         .exceptionHandling(handling -> handling
             .authenticationEntryPoint((request, response, authException) -> {
@@ -53,7 +55,8 @@ public class SpringSecurityConfig {
 
               response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
             }));
-    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider),
+    http.addFilterAt(
+        new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider),
         UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(new JWTFilter(tokenProvider), LoginFilter.class);
 
@@ -61,7 +64,8 @@ public class SpringSecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
     return configuration.getAuthenticationManager();
   }
 
