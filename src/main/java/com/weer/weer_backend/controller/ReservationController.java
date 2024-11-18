@@ -4,7 +4,6 @@ import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.dto.ReservationRequestDto;
-import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
 import com.weer.weer_backend.service.ReservationService;
@@ -28,7 +27,7 @@ public class ReservationController {
     ReservationStatus -> approve로 변경
      */
     @PostMapping("/hospitals/approve")
-    public ApiResponse<ReservationStatus> approveHospital(ReservationDTO reservationDTO){
+    public ApiResponse<ReservationStatus> approveHospital(@RequestBody ReservationDTO reservationDTO){
         reservationService.reservationApprove(reservationDTO);
         return ApiResponse.success(reservationDTO.getReservationStatus());
     }
@@ -38,7 +37,7 @@ public class ReservationController {
     ReservationStatus -> decline으로 변경
      */
     @PostMapping("/hospitals/decline")
-    public ApiResponse<ReservationStatus> declineHospital(ReservationDTO reservationDTO){
+    public ApiResponse<ReservationStatus> declineHospital(@RequestBody ReservationDTO reservationDTO){
         reservationService.reservationReject(reservationDTO);
         return ApiResponse.success(reservationDTO.getReservationStatus());
     }
