@@ -28,7 +28,7 @@ public class Emergency extends BaseEntity {
     @Column(name = "EMERGENCY_ID")
     private Long emergencyId;  // 응급실 고유 ID
 
-    @Column(name = "HPID", unique = true)
+    @Column(name = "HPID")
     private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "HVEC")
