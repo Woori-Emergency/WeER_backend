@@ -31,17 +31,15 @@ pipeline {
             }
         }
 
-        stages {
-                stage('Check Java') {  // Java 설정 확인을 위한 디버깅 스테이지 추가
-                    steps {
-                        sh '''
-                            echo "JAVA_HOME: $JAVA_HOME"
-                            echo "PATH: $PATH"
-                            java -version
-                        '''
-                    }
-                }
-        }
+        stage('Check Java') {  // Java 설정 확인을 위한 디버깅 스테이지 추가
+                            steps {
+                                sh '''
+                                    echo "JAVA_HOME: $JAVA_HOME"
+                                    echo "PATH: $PATH"
+                                    java -version
+                                '''
+                            }
+                        }
 
         stage('Build JAR') {
             steps {
