@@ -32,6 +32,7 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+docker-build.sh
 
 ### VS Code ###
 .vscode/

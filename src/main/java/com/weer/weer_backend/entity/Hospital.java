@@ -31,7 +31,7 @@ public class Hospital extends BaseEntity {
     @JoinColumn(name = "EMERGENCY_ID")
     private Emergency emergencyId;
 
-    @Column(name = "HPID", unique = true)
+    @Column(name = "HPID")
     private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "NAME")

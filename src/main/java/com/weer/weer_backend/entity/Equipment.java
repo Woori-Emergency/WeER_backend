@@ -28,7 +28,7 @@ public class Equipment extends BaseEntity {
     @Column(name = "EQUIPMENT_ID")
     private Long equipmentId;  // 장비 고유 ID
 
-    @Column(name = "HPID", unique = true)
+    @Column(name = "HPID")
     private String hpid;  // 병원 식별 코드 (ID)
 
     @Column(name = "HVVENTIAYN")
