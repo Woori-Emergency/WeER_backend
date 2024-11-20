@@ -27,7 +27,7 @@ public class LoginController {
     @PostMapping("/signup")
     public ApiResponse<String> signup(@RequestBody UserDTO userDTO){
         loginService.signUp(userDTO);
-        return ApiResponse.success("회원가입 성공!");
+        return ApiResponse.success("회원가입이 요청되었습니다.");
     }
     @PostMapping("/logout")
     public ApiResponse<String> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
