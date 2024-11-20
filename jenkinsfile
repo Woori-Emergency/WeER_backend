@@ -3,16 +3,26 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_NAME = 'weerfisa/weerBE'  // Docker Hub 이미지 이름
-        DOCKER_CREDENTIALS_ID = 'Docker-credential'           // Jenkins에 저장된 Docker Hub 자격증명 ID
-
+        DOCKER_CREDENTIALS_ID = credentials('Docker-credential')       // Jenkins에 저장된 Docker Hub 자격증명 ID
+        SPRING_APPLICATION_SECRET = credentials('Spring-application-secret')
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                     git branch: 'test/jenkins',                                    // 빌드할 브랜치
-                    credentialsId: "${GITHUB_CREDENTIALS_ID}",
                     url: 'https://github.com/Woori-Emergency/WeER_backend.git'
+            }
+        }
+
+        stage('Prepare Environment'){
+            steps{
+                    script{
+                            // application-secret 생성
+                           writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
+                           // 생성된 파일 확인
+                           sh 'ls -la application-secret.yml'
+                    }
             }
         }
 
@@ -33,8 +43,11 @@ pipeline {
                         error("JAR file not found! Ensure the build step produces a JAR.")
                     }
 
+                    // Docker 이미지 빌드
                     sh """
-                    docker build -t ${DOCKER_IMAGE_NAME}:latest --build-arg JAR_FILE=${jarFile} .
+                    docker build -t ${DOCKER_IMAGE_NAME}:latest \
+                                            --build-arg JAR_FILE=${jarFile} \
+                                            --build-arg SECRET_FILE=application-secret.yml .
                     """
                 }
             }
@@ -44,6 +57,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    // Docker Hub 로그인 및 Push
                     withDockerRegistry(credentialsId: "${DOCKER_CREDENTIALS_ID}") {
                         sh "docker push ${DOCKER_IMAGE_NAME}:latest"
                     }
