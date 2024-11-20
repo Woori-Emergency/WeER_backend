@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    // jenkins 에 tools 로 설치한 jdk 사용
+    tools {
+        jdk ("jdk21")
+    }
 
     environment {
         DOCKER_IMAGE_NAME = 'weerfisa/weerBE'  // Docker Hub 이미지 이름
