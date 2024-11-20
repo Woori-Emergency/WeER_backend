@@ -9,6 +9,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'weerfisa/weerBE'  // Docker Hub 이미지 이름
         DOCKER_CREDENTIALS_ID = credentials('Docker-credential')       // Jenkins에 저장된 Docker Hub 자격증명 ID
         SPRING_APPLICATION_SECRET = credentials('Spring-application-secret')
+        JAVA_HOME = "${tool 'jdk21'}"
     }
 
     stages {
@@ -29,6 +30,17 @@ pipeline {
                     }
             }
         }
+
+        stages {
+                stage('Check Java') {  // Java 설정 확인을 위한 디버깅 스테이지 추가
+                    steps {
+                        sh '''
+                            echo "JAVA_HOME: $JAVA_HOME"
+                            echo "PATH: $PATH"
+                            java -version
+                        '''
+                    }
+                }
 
         stage('Build JAR') {
             steps {
