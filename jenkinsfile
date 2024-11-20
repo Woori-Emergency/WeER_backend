@@ -2,7 +2,7 @@ pipeline {
     agent any
     // jenkins 에 tools 로 설치한 jdk 사용
     tools {
-        jdk ("jdk21")
+        jdk 'jdk21'
     }
 
     environment {
@@ -34,6 +34,7 @@ pipeline {
         stage('Check Java') {  // Java 설정 확인을 위한 디버깅 스테이지 추가
                             steps {
                                 sh '''
+                                    export PATH=$JAVA_HOME/bin:$PATH
                                     echo "JAVA_HOME: $JAVA_HOME"
                                     echo "PATH: $PATH"
                                     java -version
