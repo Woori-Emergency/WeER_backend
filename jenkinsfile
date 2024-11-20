@@ -9,7 +9,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'weerfisa/weerBE'  // Docker Hub 이미지 이름
         DOCKER_CREDENTIALS_ID = credentials('Docker-credential')       // Jenkins에 저장된 Docker Hub 자격증명 ID
         SPRING_APPLICATION_SECRET = credentials('Spring-application-secret')
-        JAVA_HOME = "${tool 'jdk21'}"
+        JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
     }
 
     stages {
