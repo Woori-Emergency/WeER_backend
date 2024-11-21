@@ -27,6 +27,8 @@ pipeline {
                            writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
                            // 생성된 파일 확인
                            sh 'ls -la application-secret.yml'
+                           sh 'mv application-secret.yml src/main/resources/'
+
                     }
             }
         }
