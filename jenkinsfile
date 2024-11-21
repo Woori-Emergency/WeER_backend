@@ -6,9 +6,9 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE_NAME = 'weerfisa/weerBE'  // Docker Hub 이미지 이름
+        DOCKER_IMAGE_NAME = credentials('DOCKER_IMAGE_NAME')  // Docker Hub 이미지 이름
         DOCKER_CREDENTIALS_ID = credentials('Docker-credential')       // Jenkins에 저장된 Docker Hub 자격증명 ID
-        SPRING_APPLICATION_SECRET = credentials('Spring-application-secret')
+        SPRING_APPLICATION_SECRET = credentials('application-secret')
         JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
     }
 
