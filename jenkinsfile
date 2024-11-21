@@ -49,7 +49,7 @@ pipeline {
                 script {
                     sh 'chmod +x gradlew'
                     // Gradle 빌드 실행
-                    sh './gradlew build --profile'
+                    sh './gradlew clean build --profile'
                 }
             }
         }
