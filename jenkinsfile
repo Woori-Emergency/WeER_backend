@@ -14,88 +14,110 @@ pipeline {
         ECR_URL = credentials('ECR_URL')
         IMAGE_TAG = "${ECR_URL}/${DOCKER_IMAGE_NAME}:latest"
     }
-
     stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'test/jenkins',
-                    url: 'https://github.com/Woori-Emergency/WeER_backend.git'
-            }
-        }
+            stage('Cleanup Workspace') {
+                steps {
+                    script {
+                        // 워크스페이스 정리
+                        cleanWs()
 
-        stage('Prepare Environment') {
-            steps {
-                script {
-                    writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
-                    sh '''
-                        mkdir -p src/main/resources/
-                        mv application-secret.yml src/main/resources/
-                    '''
-                }
-            }
-        }
+                        // Docker 시스템 정리
+                        sh '''
+                            docker system prune -af --volumes
+                            docker image prune -af
+                            df -h
+                        '''
 
-        stage('Check Java') {
-            steps {
-                sh '''
-                    export PATH=$JAVA_HOME/bin:$PATH
-                    echo "JAVA_HOME: $JAVA_HOME"
-                    echo "PATH: $PATH"
-                    java -version
-                '''
-            }
-        }
-
-        stage('Build JAR') {
-            steps {
-                script {
-                    sh '''
-                        chmod +x gradlew
-                        ./gradlew clean build -x test --stacktrace
-                    '''
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
-                    if (!fileExists(jarFile)) {
-                        error("JAR file not found! Ensure the build step produces a JAR.")
+                        // 오래된 빌드 결과물 정리
+                        sh '''
+                            rm -rf ~/.gradle/caches/
+                            rm -rf ~/.gradle/wrapper/
+                            rm -rf /var/jenkins_home/.gradle/
+                        '''
                     }
-
-                    sh """
-                        docker build -t ${IMAGE_TAG} \\
-                            --build-arg JAR_FILE=${jarFile} \\
-                            --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
-                    """
                 }
             }
-        }
 
-        stage('Upload Image to ECR') {
-                    steps {
-                        script {
-                            // AWS CLI를 사용하여 ECR 로그인
-                            sh """
-                                aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
-                                docker push ${IMAGE_TAG}
-                            """
+            stage('Clone Repository') {
+                steps {
+                    git branch: 'test/jenkins',
+                        url: 'https://github.com/Woori-Emergency/WeER_backend.git'
+                }
+            }
+
+            stage('Prepare Environment') {
+                steps {
+                    script {
+                        writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
+                        sh '''
+                            mkdir -p src/main/resources/
+                            mv application-secret.yml src/main/resources/
+                        '''
+                    }
+                }
+            }
+
+            stage('Build JAR') {
+                steps {
+                    script {
+                        // Gradle 캐시 사용하지 않기
+                        sh '''
+                            chmod +x gradlew
+                            ./gradlew clean bootJar --no-daemon --build-cache=false
+                            ls -la build/libs/
+                        '''
+                    }
+                }
+            }
+
+            stage('Build Docker Image') {
+                steps {
+                    script {
+                        def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
+                        echo "Found JAR file: ${jarFile}"
+
+                        if (!fileExists(jarFile)) {
+                            error("JAR 파일을 찾을 수 없습니다!")
                         }
+
+                        sh """
+                            docker build -t ${IMAGE_TAG} . --no-cache
+                            docker image prune -f
+                        """
                     }
                 }
             }
 
-    post {
-        always {
-            cleanWs()
+            stage('Upload Image to ECR') {
+                steps {
+                    script {
+                        sh """
+                            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
+                            docker push ${IMAGE_TAG}
+                        """
+                    }
+                }
+            }
         }
-        success {
-            echo 'Build and push succeeded!'
-        }
-        failure {
-            echo 'Build or push failed.'
+
+        post {
+            always {
+                script {
+                    // 빌드 후 정리
+                    sh '''
+                        docker system prune -af
+                        docker image prune -af
+                        rm -rf ~/.gradle/
+                        df -h
+                    '''
+                    cleanWs()
+                }
+            }
+            success {
+                echo '빌드와 푸시가 성공했습니다!'
+            }
+            failure {
+                echo '빌드 또는 푸시가 실패했습니다.'
+            }
         }
     }
-}
