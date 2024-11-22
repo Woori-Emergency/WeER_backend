@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+     docker {
+                image 'docker:latest'
+                args '-v /var/run/docker.sock:/var/run/docker.sock'
+            }
+    }
     // jenkins 에 tools 로 설치한 jdk 사용
     tools {
         jdk 'jdk21'
@@ -44,22 +49,23 @@ pipeline {
                             }
                         }
 
-        stage('Build JAR') {
-            steps {
-                script {
-                    sh 'chmod +x gradlew'
-                    // Gradle 빌드 실행
-                    sh './gradlew clean build -x test --profile'
-                }
-            }
-        }
+//         stage('Build JAR') {
+//             steps {
+//                 script {
+//                     sh 'chmod +x gradlew'
+//                     // Gradle 빌드 실행
+//                     sh './gradlew clean build -x test --profile'
+//                 }
+//             }
+//         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                sh "docker build -t ${env.DOCKER_IMAGE_NAME}:latest ."
-                }
-            }
+                            sh """
+                                docker build \
+                                -t '${env.DOCKER_IMAGE_NAME ?: 'default-image-name'}:latest' .
+                            """
+                        }
         }
 
 
