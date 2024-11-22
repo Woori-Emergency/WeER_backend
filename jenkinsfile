@@ -57,18 +57,16 @@ pipeline {
                 }
             }
 
-            stage('Build JAR') {
-                steps {
-                    script {
-                        // Gradle 캐시 사용하지 않기
-                        sh '''
-                            chmod +x gradlew
-                            ./gradlew clean bootJar --no-daemon --build-cache=false
-                            ls -la build/libs/
-                        '''
+                    stage('Build JAR') {
+                        steps {
+                            script {
+                                sh '''
+                                    chmod +x gradlew
+                                    ./gradlew clean build -x test --stacktrace
+                                '''
+                            }
+                        }
                     }
-                }
-            }
 
             stage('Build Docker Image') {
                 steps {
@@ -81,12 +79,13 @@ pipeline {
                         }
 
                         sh """
-                            docker build -t ${IMAGE_TAG} . --no-cache
-                            docker image prune -f
-                        """
-                    }
-                }
-            }
+                                                docker build -t ${IMAGE_TAG} \\
+                                                    --build-arg JAR_FILE=${jarFile} \\
+                                                    --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
+                                            """
+                                        }
+                                    }
+                                }
 
             stage('Upload Image to ECR') {
                 steps {
