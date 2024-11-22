@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,7 +36,7 @@ public class CommonApiService {
         this.eventPublisher = eventPublisher;
     }
 
-    //@Scheduled(fixedRate = 3600000) // 60분마다 호출
+    @Scheduled(fixedRate = 3600000) // 60분마다 호출
     public void updateApiDataForAllDistricts() {
         System.out.println("서울특별시 모든 구에 대한 외부 API 데이터 갱신 중...");
         for (String district : districts) {
@@ -57,7 +58,7 @@ public class CommonApiService {
                 .build()
                 .toUri();
 
-        System.out.println("API 요청 URI: " + uri);
+        System.out.println("API 요청 URI: " + uri + " | 지역: " + stage2);
         return restTemplate.getForObject(uri, String.class);
     }
 

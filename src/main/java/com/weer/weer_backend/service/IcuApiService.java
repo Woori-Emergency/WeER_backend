@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
@@ -61,38 +62,44 @@ public class IcuApiService {
                     continue;
                 }
 
+// item 노드 리스트 가져오기
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
-                    String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
+                    // 현재 item 노드 가져오기
+                    Node currentItem = items.item(i);
 
-                    Integer hvcc = XmlParsingUtils.parseIntegerSafely(doc, "hvcc", i);
-                    Integer hvncc = XmlParsingUtils.parseIntegerSafely(doc, "hvncc", i);
-                    Integer hvccc = XmlParsingUtils.parseIntegerSafely(doc, "hvccc", i);
-                    Integer hvicc = XmlParsingUtils.parseIntegerSafely(doc, "hvicc", i);
-                    Integer hv2 = XmlParsingUtils.parseIntegerSafely(doc, "hv2", i);
-                    Integer hv3 = XmlParsingUtils.parseIntegerSafely(doc, "hv3", i);
-                    Integer hv6 = XmlParsingUtils.parseIntegerSafely(doc, "hv6", i);
-                    Integer hv8 = XmlParsingUtils.parseIntegerSafely(doc, "hv8", i);
-                    Integer hv9 = XmlParsingUtils.parseIntegerSafely(doc, "hv9", i);
-                    Integer hv32 = XmlParsingUtils.parseIntegerSafely(doc, "hv32", i);
-                    Integer hv34 = XmlParsingUtils.parseIntegerSafely(doc, "hv34", i);
-                    Integer hv35 = XmlParsingUtils.parseIntegerSafely(doc, "hv35", i);
-                    Integer hvs11 = XmlParsingUtils.parseIntegerSafely(doc, "hvs11", i);
-                    Integer hvS08 = XmlParsingUtils.parseIntegerSafely(doc, "hvs08", i);
-                    Integer hvs16 = XmlParsingUtils.parseIntegerSafely(doc, "hvs16", i);
-                    Integer hvs17 = XmlParsingUtils.parseIntegerSafely(doc, "hvs17", i);
-                    Integer hvs06 = XmlParsingUtils.parseIntegerSafely(doc, "hvs06", i);
-                    Integer hvs07 = XmlParsingUtils.parseIntegerSafely(doc, "hvs07", i);
-                    Integer hvs12 = XmlParsingUtils.parseIntegerSafely(doc, "hvs12", i);
-                    Integer hvs13 = XmlParsingUtils.parseIntegerSafely(doc, "hvs13", i);
-                    Integer hvs14 = XmlParsingUtils.parseIntegerSafely(doc, "hvs14", i);
-                    Integer hvs09 = XmlParsingUtils.parseIntegerSafely(doc, "hvs09", i);
-                    Integer hvs15 = XmlParsingUtils.parseIntegerSafely(doc, "hvs15", i);
-                    Integer hvs18 = XmlParsingUtils.parseIntegerSafely(doc, "hvs18", i);
+                    // 데이터 추출
+                    String hpid = XmlParsingUtils.getTextContentSafely(currentItem, "hpid");
+                    Integer hvcc = XmlParsingUtils.parseIntegerSafely(currentItem, "hvcc");
+                    Integer hvncc = XmlParsingUtils.parseIntegerSafely(currentItem, "hvncc");
+                    Integer hvccc = XmlParsingUtils.parseIntegerSafely(currentItem, "hvccc");
+                    Integer hvicc = XmlParsingUtils.parseIntegerSafely(currentItem, "hvicc");
+                    Integer hv2 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv2");
+                    Integer hv3 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv3");
+                    Integer hv6 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv6");
+                    Integer hv8 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv8");
+                    Integer hv9 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv9");
+                    Integer hv32 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv32");
+                    Integer hv34 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv34");
+                    Integer hv35 = XmlParsingUtils.parseIntegerSafely(currentItem, "hv35");
+                    Integer hvs11 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs11");
+                    Integer hvs08 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs08");
+                    Integer hvs16 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs16");
+                    Integer hvs17 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs17");
+                    Integer hvs06 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs06");
+                    Integer hvs07 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs07");
+                    Integer hvs12 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs12");
+                    Integer hvs13 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs13");
+                    Integer hvs14 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs14");
+                    Integer hvs09 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs09");
+                    Integer hvs15 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs15");
+                    Integer hvs18 = XmlParsingUtils.parseIntegerSafely(currentItem, "hvs18");
 
+                    // ICU 데이터 저장 또는 업데이트
                     saveOrUpdateIcu(hpid, hvcc, hvncc, hvccc, hvicc, hv2, hv3, hv6, hv8, hv9, hv32, hv34, hv35, hvs11,
-                            hvS08, hvs16, hvs17, hvs06, hvs07, hvs12, hvs13, hvs14, hvs09, hvs15, hvs18);
+                            hvs08, hvs16, hvs17, hvs06, hvs07, hvs12, hvs13, hvs14, hvs09, hvs15, hvs18);
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("XML 파싱 오류 발생");

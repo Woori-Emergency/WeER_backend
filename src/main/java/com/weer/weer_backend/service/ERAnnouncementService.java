@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,7 +36,7 @@ public class ERAnnouncementService {
   private final String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
   private final RestTemplate restTemplate;
 
-  //@EventListener
+  @EventListener
   public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
     System.out.println("이벤트 수신: " + event.getMessage());
     getHospitalInfoForAllDistricts();
@@ -86,20 +87,23 @@ public class ERAnnouncementService {
         // item 노드 리스트 가져오기
         NodeList items = doc.getElementsByTagName("item");
         for (int i = 0; i < items.getLength(); i++) {
-          String rnum = XmlParsingUtils.getTextContentSafely(doc, "rnum", i);
-          String dutyAddr = XmlParsingUtils.getTextContentSafely(doc, "dutyAddr", i);
-          String dutyName = XmlParsingUtils.getTextContentSafely(doc, "dutyName", i);
-          String emcOrgCod = XmlParsingUtils.getTextContentSafely(doc, "emcOrgCod", i);
-          String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
-          String symBlkMsg = XmlParsingUtils.getTextContentSafely(doc, "symBlkMsg", i);
-          String symBlkMsgTyp = XmlParsingUtils.getTextContentSafely(doc, "symBlkMsgTyp", i);
-          String symTypCod = XmlParsingUtils.getTextContentSafely(doc, "symTypCod", i);
-          String symTypCodMag = XmlParsingUtils.getTextContentSafely(doc, "symTypCodMag", i);
-          String symOutDspYon = XmlParsingUtils.getTextContentSafely(doc, "symOutDspYon", i);
-          String symOutDspMth = XmlParsingUtils.getTextContentSafely(doc, "symOutDspMth", i);
-          String symBlkSttDtm = XmlParsingUtils.getTextContentSafely(doc, "symBlkSttDtm", i);
-          String symBlkDtm = XmlParsingUtils.getTextContentSafely(doc, "symBlkDtm", i);
+          // 현재 item 노드 가져오기
+          org.w3c.dom.Node currentItem = items.item(i);
 
+          // 데이터 추출
+          String rnum = XmlParsingUtils.getTextContentSafely(currentItem, "rnum");
+          String dutyAddr = XmlParsingUtils.getTextContentSafely(currentItem, "dutyAddr");
+          String dutyName = XmlParsingUtils.getTextContentSafely(currentItem, "dutyName");
+          String emcOrgCod = XmlParsingUtils.getTextContentSafely(currentItem, "emcOrgCod");
+          String hpid = XmlParsingUtils.getTextContentSafely(currentItem, "hpid");
+          String symBlkMsg = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkMsg");
+          String symBlkMsgTyp = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkMsgTyp");
+          String symTypCod = XmlParsingUtils.getTextContentSafely(currentItem, "symTypCod");
+          String symTypCodMag = XmlParsingUtils.getTextContentSafely(currentItem, "symTypCodMag");
+          String symOutDspYon = XmlParsingUtils.getTextContentSafely(currentItem, "symOutDspYon");
+          String symOutDspMth = XmlParsingUtils.getTextContentSafely(currentItem, "symOutDspMth");
+          String symBlkSttDtm = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkSttDtm");
+          String symBlkDtm = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkDtm");
           ERAnnouncement erAnnouncement = ERAnnouncement.builder()
               .hospitalId(hospital)  // Ensure hospital is managed
               .msgType(symBlkMsgTyp)

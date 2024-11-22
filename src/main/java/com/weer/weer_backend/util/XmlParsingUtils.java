@@ -1,52 +1,51 @@
 package com.weer.weer_backend.util;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class XmlParsingUtils {
 
-    /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 안전하게 텍스트 콘텐츠를 가져온다
-     *
-     * @param doc XML Document 객체
-     * @param tagName 태그 이름
-     * @param index 요소 인덱스
-     * @return 요소의 텍스트 콘텐츠 또는 null (존재하지 않는 경우)
-     */
-    public static String getTextContentSafely(Document doc, String tagName, int index) {
-        NodeList nodeList = doc.getElementsByTagName(tagName);
-        return (nodeList != null && nodeList.item(index) != null) ? nodeList.item(index).getTextContent() : null;
+    public static String getTextContentSafely(Node item, String tagName) {
+        NodeList nodeList = ((Element) item).getElementsByTagName(tagName);
+        return (nodeList != null && nodeList.item(0) != null) ? nodeList.item(0).getTextContent() : null;
     }
 
     /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 Integer 값을 안전하게 파싱
+     * 현재 <item> 노드에서 지정한 태그의 값을 Integer로 파싱합니다.
      *
-     * @param doc XML Document 객체
-     * @param tagName 태그 이름
-     * @param index 요소 인덱스
-     * @return Integer 값 또는 null (값이 없거나 파싱 불가한 경우)
+     * @param node 현재 <item> 노드
+     * @param tagName 가져올 태그 이름
+     * @return Integer 값, 또는 null
      */
-    public static Integer parseIntegerSafely(Document doc, String tagName, int index) {
-        String textContent = getTextContentSafely(doc, tagName, index);
-        return textContent != null ? Integer.parseInt(textContent) : null;
-    }
-
-    /**
-     * XML Document에서 지정한 태그 이름과 인덱스로 Boolean 값을 안전하게 파싱
-     * "Y"이면 true, "N1"이면 false로 변환하며, 그 외는 null로 처리
-     *
-     * @param doc XML Document 객체
-     * @param tagName 태그 이름
-     * @param index 요소 인덱스
-     * @return Boolean 값 또는 null
-     */
-    public static Boolean parseBooleanSafely(Document doc, String tagName, int index) {
-        String textContent = getTextContentSafely(doc, tagName, index);
-        if ("Y".equalsIgnoreCase(textContent)) {
-            return true;
-        } else if ("N1".equalsIgnoreCase(textContent)) {
-            return false;
+    public static Integer parseIntegerSafely(Node node, String tagName) {
+        String textContent = getTextContentSafely(node, tagName);
+        try {
+            return (textContent != null && !textContent.trim().isEmpty()) ? Integer.parseInt(textContent.trim()) : null;
+        } catch (NumberFormatException e) {
+            System.out.println("Failed to parse integer for tag: " + tagName + ", value: " + textContent);
+            return null;
         }
-        return null; // "Y" 또는 "N1" 이외의 값은 null
+    }
+
+    /**
+     * 현재 <item> 노드에서 지정한 태그의 값을 Boolean으로 파싱합니다.
+     *
+     * @param node 현재 <item> 노드
+     * @param tagName 가져올 태그 이름
+     * @return Boolean 값, 또는 null
+     */
+    public static Boolean parseBooleanSafely(Node node, String tagName) {
+        String textContent = getTextContentSafely(node, tagName);
+        if (textContent == null) return null;
+        switch (textContent.trim().toUpperCase()) {
+            case "Y":
+                return true;
+            case "N1":
+                return false;
+            default:
+                return null;
+        }
     }
 }
