@@ -15,8 +15,10 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
@@ -33,7 +35,7 @@ public class EquipmentApiService {
     @Autowired
     private HospitalRepository hospitalRepository;
 
-    //@EventListener
+    @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
         System.out.println("장비 데이터 이벤트 수신: " + event.getMessage());
         getEquipmentInfoForAllDistricts();
@@ -62,33 +64,36 @@ public class EquipmentApiService {
 
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
-                    String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
-                    Boolean hvventiAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvventiayn", i);
-                    Boolean hvventisoAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvventisoayn", i);
-                    Boolean hvinCUAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvincuayn", i);
-                    Boolean hvcrrTAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvcrrtayn", i);
-                    Boolean hvecmoAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvecmoayn", i);
-                    Boolean hvhypoAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvhypoayn", i);
-                    Boolean hvoxyAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvoxyayn", i);
-                    Boolean hvctAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvctayn", i);
-                    Boolean hvmriAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvmriayn", i);
-                    Boolean hvangioAYN = XmlParsingUtils.parseBooleanSafely(doc, "hvangioayn", i);
+                    Node item = items.item(i);  // 현재 <item> 노드를 기준으로 파싱
 
-                    Integer hvs30 = XmlParsingUtils.parseIntegerSafely(doc, "hvs30", i);
-                    Integer hvs31 = XmlParsingUtils.parseIntegerSafely(doc, "hvs31", i);
-                    Integer hvs32 = XmlParsingUtils.parseIntegerSafely(doc, "hvs32", i);
-                    Integer hvs33 = XmlParsingUtils.parseIntegerSafely(doc, "hvs33", i);
-                    Integer hvs34 = XmlParsingUtils.parseIntegerSafely(doc, "hvs34", i);
-                    Integer hvs35 = XmlParsingUtils.parseIntegerSafely(doc, "hvs35", i);
-                    Integer hvs37 = XmlParsingUtils.parseIntegerSafely(doc, "hvs37", i);
-                    Integer hvs27 = XmlParsingUtils.parseIntegerSafely(doc, "hvs27", i);
-                    Integer hvs28 = XmlParsingUtils.parseIntegerSafely(doc, "hvs28", i);
-                    Integer hvs29 = XmlParsingUtils.parseIntegerSafely(doc, "hvs29", i);
+                    String hpid = XmlParsingUtils.getTextContentSafely(item, "hpid");
+                    Boolean hvventiAYN = XmlParsingUtils.parseBooleanSafely(item, "hvventiayn");
+                    Boolean hvventisoAYN = XmlParsingUtils.parseBooleanSafely(item, "hvventisoayn");
+                    Boolean hvinCUAYN = XmlParsingUtils.parseBooleanSafely(item, "hvincuayn");
+                    Boolean hvcrrTAYN = XmlParsingUtils.parseBooleanSafely(item, "hvcrrtayn");
+                    Boolean hvecmoAYN = XmlParsingUtils.parseBooleanSafely(item, "hvecmoayn");
+                    Boolean hvhypoAYN = XmlParsingUtils.parseBooleanSafely(item, "hvhypoayn");
+                    Boolean hvoxyAYN = XmlParsingUtils.parseBooleanSafely(item, "hvoxyayn");
+                    Boolean hvctAYN = XmlParsingUtils.parseBooleanSafely(item, "hvctayn");
+                    Boolean hvmriAYN = XmlParsingUtils.parseBooleanSafely(item, "hvmriayn");
+                    Boolean hvangioAYN = XmlParsingUtils.parseBooleanSafely(item, "hvangioayn");
+
+                    Integer hvs30 = XmlParsingUtils.parseIntegerSafely(item, "hvs30");
+                    Integer hvs31 = XmlParsingUtils.parseIntegerSafely(item, "hvs31");
+                    Integer hvs32 = XmlParsingUtils.parseIntegerSafely(item, "hvs32");
+                    Integer hvs33 = XmlParsingUtils.parseIntegerSafely(item, "hvs33");
+                    Integer hvs34 = XmlParsingUtils.parseIntegerSafely(item, "hvs34");
+                    Integer hvs35 = XmlParsingUtils.parseIntegerSafely(item, "hvs35");
+                    Integer hvs37 = XmlParsingUtils.parseIntegerSafely(item, "hvs37");
+                    Integer hvs27 = XmlParsingUtils.parseIntegerSafely(item, "hvs27");
+                    Integer hvs28 = XmlParsingUtils.parseIntegerSafely(item, "hvs28");
+                    Integer hvs29 = XmlParsingUtils.parseIntegerSafely(item, "hvs29");
 
                     saveOrUpdateEquipment(hpid, hvventiAYN, hvventisoAYN, hvinCUAYN, hvcrrTAYN, hvecmoAYN, hvhypoAYN,
                             hvoxyAYN, hvctAYN, hvmriAYN, hvangioAYN, hvs30, hvs31, hvs32, hvs33,
                             hvs34, hvs35, hvs37, hvs27, hvs28, hvs29);
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("XML 파싱 오류 발생");
