@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         AWS_CREDENTIALS_ID = credentials('aws-credentials')
-        DOCKER_IMAGE_NAME = 'weer/be'
+        DOCKER_IMAGE_NAME = 'ce7/weer-be'
         DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')
         SPRING_APPLICATION_SECRET = credentials('application-secret')
         JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
