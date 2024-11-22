@@ -57,17 +57,36 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
-                    if (!fileExists(jarFile)) {
-                        error("JAR file not found! Ensure the build step produces a JAR.")
+                    // JAR 파일 찾기 - 안전한 방식으로 수정
+                    def jarFile = ""
+                    dir('build/libs') {
+                        jarFile = sh(
+                            script: "find . -name '*.jar' -type f | head -n 1",
+                            returnStdout: true
+                        ).trim()
+
+                        // 상대 경로에서 ./를 제거
+                        jarFile = jarFile.replaceFirst('^./', '')
+
+                        if (jarFile.isEmpty()) {
+                            error("JAR 파일을 찾을 수 없습니다. 빌드 단계에서 JAR가 정상적으로 생성되었는지 확인하세요.")
+                        }
                     }
 
-                    // Docker 이미지 빌드
-                    sh """
-                    docker build -t ${DOCKER_IMAGE_NAME}:latest \
-                                            --build-arg JAR_FILE=${jarFile} \
-                                            --build-arg SECRET_FILE=application-secret.yml .
+                    // Docker 이미지 빌드 - 보안 취약점 수정
+                    def dockerBuildCmd = """
+                        docker build \
+                        --no-cache \
+                        -t '${env.DOCKER_IMAGE_NAME}:latest' \
+                        --build-arg JAR_FILE='build/libs/${jarFile}' \
+                        --build-arg SECRET_FILE='application-secret.yml' \
+                        .
                     """
+
+                    // Docker 빌드 실행
+                    withDockerRegistry([ credentialsId: "DOCKER_CREDENTIALS_ID", url: "" ]) {
+                        sh dockerBuildCmd
+                    }
                 }
             }
         }
