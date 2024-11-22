@@ -56,6 +56,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Docker CLI 설치
+                    sh '''
+                        apt-get update
+                        apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+                        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+                        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+                        apt-get update
+                        apt-get -y install docker-ce-cli
+                    '''
+
                     def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
                     if (!fileExists(jarFile)) {
                         error("JAR file not found! Ensure the build step produces a JAR.")
@@ -63,8 +73,8 @@ pipeline {
 
                     // Docker 이미지 빌드
                     sh """
-                    docker build -t ${DOCKER_IMAGE_NAME}:latest \
-                                            --build-arg JAR_FILE=${jarFile} \
+                    docker build -t ${DOCKER_IMAGE_NAME}:latest \\
+                                            --build-arg JAR_FILE=${jarFile} \\
                                             --build-arg SECRET_FILE=application-secret.yml .
                     """
                 }
