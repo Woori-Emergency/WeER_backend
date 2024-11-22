@@ -1,0 +1,125 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk21'
+    }
+
+    environment {
+        AWS_CREDENTIALS_ID = credentials('aws-credentials')
+        DOCKER_IMAGE_NAME =  credentials('DOCKER_IMAGE_NAME')
+        DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')
+        SPRING_APPLICATION_SECRET = credentials('application-secret')
+        JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
+        ECR_URL = credentials('ECR_URL')
+        IMAGE_TAG = "${ECR_URL}/${DOCKER_IMAGE_NAME}:latest"
+    }
+    stages {
+            stage('Cleanup Workspace') {
+                steps {
+                    script {
+                        // 워크스페이스 정리
+                        cleanWs()
+
+                        // Docker 시스템 정리
+                        sh '''
+                            docker system prune -af --volumes
+                            docker image prune -af
+                            df -h
+                        '''
+
+                        // 오래된 빌드 결과물 정리
+                        sh '''
+                            rm -rf ~/.gradle/caches/
+                            rm -rf ~/.gradle/wrapper/
+                            rm -rf /var/jenkins_home/.gradle/
+                        '''
+                    }
+                }
+            }
+
+            stage('Clone Repository') {
+                steps {
+                    git branch: 'develop',
+                        url: 'https://github.com/Woori-Emergency/WeER_backend.git'
+                }
+            }
+
+            stage('Prepare Environment') {
+                steps {
+                    script {
+                        writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
+                        sh '''
+                            mkdir -p src/main/resources/
+                            mv application-secret.yml src/main/resources/
+                        '''
+                    }
+                }
+            }
+
+                    stage('Build JAR') {
+                        steps {
+                            script {
+                                sh '''
+                                    chmod +x gradlew
+                                    ./gradlew clean build -x test --stacktrace
+                                '''
+                            }
+                        }
+                    }
+
+            stage('Build Docker Image') {
+                steps {
+                    script {
+                        def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
+                        echo "Found JAR file: ${jarFile}"
+
+                        if (!fileExists(jarFile)) {
+                            error("JAR 파일을 찾을 수 없습니다!")
+                        }
+
+                        sh """
+                                        docker build -t ${IMAGE_TAG} \\
+                                            --build-arg JAR_FILE=${jarFile} \\
+                                            --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
+                                    """
+                                        }
+                                    }
+                                }
+
+            stage('Upload Image to ECR') {
+                steps {
+                    script {
+                         sh """
+                                        echo "ECR URL: ${ECR_URL}"
+                                        echo "Image tag: ${IMAGE_TAG}"
+                                        docker images
+                                        aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
+                                        docker push ${IMAGE_TAG}
+                                    """
+                    }
+                }
+            }
+        }
+
+        post {
+            always {
+                script {
+                    // 빌드 후 정리
+                    sh '''
+                        docker system prune -af
+                        docker image prune -af
+                        rm -rf ~/.gradle/
+                        df -h
+                    '''
+                    cleanWs()
+                }
+            }
+            success {
+                echo '빌드와 푸시가 성공했습니다!'
+            }
+            failure {
+                echo '빌드 또는 푸시가 실패했습니다.'
+            }
+        }
+    }
