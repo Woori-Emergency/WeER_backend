@@ -7,12 +7,12 @@ pipeline {
 
     environment {
         AWS_CREDENTIALS_ID = credentials('aws-credentials')
-        DOCKER_IMAGE_NAME = 'ce7/weer-be'
+        DOCKER_IMAGE_NAME =  'ce7/weer-be'
         DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')
         SPRING_APPLICATION_SECRET = credentials('application-secret')
         JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
         ECR_URL = credentials('ECR_URL')
-        IMAGE_TAG = "${ECR_URL}/${DOCKER_IMAGE_NAME}:latest"
+        IMAGE_TAG = "${ECR_URL}:latest"
     }
     stages {
             stage('Cleanup Workspace') {
@@ -79,10 +79,10 @@ pipeline {
                         }
 
                         sh """
-                                                docker build -t ${IMAGE_TAG} \\
-                                                    --build-arg JAR_FILE=${jarFile} \\
-                                                    --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
-                                            """
+                                        docker build -t ${ECR_URL}/ce7/weer-be:latest \\
+                                            --build-arg JAR_FILE=${jarFile} \\
+                                            --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
+                                    """
                                         }
                                     }
                                 }
