@@ -1,55 +1,58 @@
 pipeline {
     agent any
-    // jenkins 에 tools 로 설치한 jdk 사용
+
     tools {
         jdk 'jdk21'
     }
 
     environment {
-        DOCKER_IMAGE_NAME = 'weer/be'  // Docker Hub 이미지 이름
-        DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')       // Jenkins에 저장된 Docker Hub 자격증명 ID
+        AWS_CREDENTIALS_ID = credentials('aws-credentials')
+        DOCKER_IMAGE_NAME = 'weer/be'
+        DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')
         SPRING_APPLICATION_SECRET = credentials('application-secret')
         JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
         ECR_URL = credentials('ECR_URL')
+        IMAGE_TAG = "${ECR_URL}/${DOCKER_IMAGE_NAME}:latest"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                    git branch: 'test/jenkins',                                    // 빌드할 브랜치
+                git branch: 'test/jenkins',
                     url: 'https://github.com/Woori-Emergency/WeER_backend.git'
             }
         }
 
-        stage('Prepare Environment'){
-            steps{
-                    script{
-                            // application-secret 생성
-                           writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
-                           // 생성된 파일 확인
-                           sh 'ls -la application-secret.yml'
-                           sh 'mv application-secret.yml src/main/resources/'
-
-                    }
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
+                    sh '''
+                        mkdir -p src/main/resources/
+                        mv application-secret.yml src/main/resources/
+                    '''
+                }
             }
         }
 
-        stage('Check Java') {  // Java 설정 확인을 위한 디버깅 스테이지 추가
-                            steps {
-                                sh '''
-                                    export PATH=$JAVA_HOME/bin:$PATH
-                                    echo "JAVA_HOME: $JAVA_HOME"
-                                    echo "PATH: $PATH"
-                                    java -version
-                                '''
-                            }
-                        }
+        stage('Check Java') {
+            steps {
+                sh '''
+                    export PATH=$JAVA_HOME/bin:$PATH
+                    echo "JAVA_HOME: $JAVA_HOME"
+                    echo "PATH: $PATH"
+                    java -version
+                '''
+            }
+        }
 
 //         stage('Build JAR') {
 //             steps {
 //                 script {
-//                     sh 'chmod +x gradlew'
-//                     sh './gradlew clean build -x test --profile'
+//                     sh '''
+//                         chmod +x gradlew
+//                         ./gradlew clean build -x test --stacktrace
+//                     '''
 //                 }
 //             }
 //         }
@@ -62,35 +65,34 @@ pipeline {
                         error("JAR file not found! Ensure the build step produces a JAR.")
                     }
 
-                    // Docker 이미지 빌드
                     sh """
-                    docker build -t ${DOCKER_IMAGE_NAME}:latest \\
-                                            --build-arg JAR_FILE=${jarFile} \\
-                                            --build-arg SECRET_FILE=application-secret.yml .
+                        docker build -t ${IMAGE_TAG} \\
+                            --build-arg JAR_FILE=${jarFile} \\
+                            --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
                     """
                 }
             }
         }
 
-
         stage('Upload Image to ECR') {
             steps {
                 script {
-                   withAWS(credentials: AWS_CREDENTIALS_ID, region: 'ap-northeast-2') {
-                       def login = sh(
-                           script: "aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}",
-                           returnStatus: true
-                      }
-
-                       // ECR로 이미지 푸시
-                       sh "docker push ${DOCKER_IMAGE_NAME} "
-                   }
+                    withAWS(credentials: AWS_CREDENTIALS_ID, region: 'ap-northeast-2') {
+                        sh """
+                            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
+                            docker tag ${IMAGE_TAG} ${IMAGE_TAG}
+                            docker push ${IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
     }
 
     post {
+        always {
+            cleanWs()
+        }
         success {
             echo 'Build and push succeeded!'
         }
