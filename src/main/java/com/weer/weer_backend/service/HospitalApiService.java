@@ -71,9 +71,9 @@ public class HospitalApiService {
                 .toUri();
 
         // 요청 URI 출력
-        System.out.println("요청 URI: " + uri);
+        //System.out.println("요청 URI: " + uri);
         String xmlResponse = restTemplate.getForObject(uri, String.class);
-        System.out.println("API 응답: " + xmlResponse);
+        //System.out.println("API 응답: " + xmlResponse);
 
         try {
             // XML 문자열을 Document 객체로 파싱

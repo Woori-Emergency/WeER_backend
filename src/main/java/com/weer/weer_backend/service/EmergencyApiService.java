@@ -41,7 +41,7 @@ public class EmergencyApiService {
      */
     @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
-        System.out.println("이벤트 수신: " + event.getMessage());
+        System.out.println("응급실 데이터 이벤트 수신: " + event.getMessage());
         getEmergencyInfoForAllDistricts();
     }
 
@@ -91,8 +91,8 @@ public class EmergencyApiService {
                     Integer hvs49 = XmlParsingUtils.parseIntegerSafely(item, "hvs49");
 
                     // 디버깅 출력 추가
-                    System.out.println("Processing hospital: " + hpid);
-                    System.out.println("hv15=" + hv15 + ", hvs48=" + hvs48 + ", hv16=" + hv16 + ", hvs49=" + hvs49);
+                    //System.out.println("Processing hospital: " + hpid);
+                    //System.out.println("hv15=" + hv15 + ", hvs48=" + hvs48 + ", hv16=" + hv16 + ", hvs49=" + hvs49);
 
                     saveOrUpdateEmergency(hpid, hvec, hv27, hv29, hv30, hv28, hv15, hv16, hvs01, hvs59, hvs03, hvs04, hvs02, hvs48, hvs49);
                 }
