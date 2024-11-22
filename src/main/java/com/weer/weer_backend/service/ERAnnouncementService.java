@@ -44,7 +44,7 @@ public class ERAnnouncementService {
 
   // @PostConstruct 제거하고, 대신 @Scheduled 사용
 
-  @Scheduled(fixedRate = 3600000) // 60분마다 호출 (60분 = 3600000밀리초)
+  //@Scheduled(fixedRate = 3600000) // 60분마다 호출 (60분 = 3600000밀리초)
   public void scheduledTask() {
     System.out.println("스케줄링 작업: 병원 공지 데이터를 60분마다 불러옵니다.");
     getHospitalInfoForAllDistricts();
