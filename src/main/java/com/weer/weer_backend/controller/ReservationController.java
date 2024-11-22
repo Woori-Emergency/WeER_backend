@@ -1,23 +1,27 @@
 package com.weer.weer_backend.controller;
 
-import com.weer.weer_backend.dto.ApiResponse;
-import com.weer.weer_backend.dto.PatientConditionResponseDTO;
-import com.weer.weer_backend.dto.ReservationDTO;
-import com.weer.weer_backend.dto.ReservationRequestDto;
+import com.weer.weer_backend.dto.*;
 import com.weer.weer_backend.entity.Reservation;
 import com.weer.weer_backend.enums.ReservationStatus;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.service.ReservationService;
+import com.weer.weer_backend.service.UserService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final UserService userService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, UserService userService) {
         this.reservationService = reservationService;
+        this.userService = userService;
     }
 
     // ToDo : 병원 예약 시스템 개발
@@ -26,6 +30,18 @@ public class ReservationController {
     /*
     ReservationStatus -> approve로 변경
      */
+    @GetMapping("/hospitals/hospital-name")
+    public ApiResponse<String> getUserHospitalId(@AuthenticationPrincipal SecurityUser user) {
+        Long id = user.getUser().getUserId();
+        try {
+            String hospitalName = userService.getHospitalName(id);
+            return ApiResponse.success(hospitalName);
+        }
+        catch(Exception e){
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+    }
+
     @PostMapping("/hospitals/approve")
     public ApiResponse<ReservationStatus> approveHospital(@RequestBody ReservationDTO reservationDTO){
         reservationService.reservationApprove(reservationDTO);

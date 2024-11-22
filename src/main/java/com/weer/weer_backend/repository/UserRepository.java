@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     // 사용자 관련 추가 메서드 정의 가능
     List<User> findByApproved(Approve approved);  // 'approved' 필드로 사용자 조회
+
+    Optional<User> findFirstByUserId(Long userId);
 }
 
