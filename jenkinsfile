@@ -56,16 +56,20 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Docker CLI 설치
-                    sh '''
-                        apt-get update
-                        apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-                        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-                        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-                        apt-get update
-                        apt-get -y install docker-ce-cli
-                    '''
-
+                sh '''
+                                whoami
+                                apt-get update || true
+                                apt-get install -y ca-certificates curl gnupg || true
+                                install -m 0755 -d /etc/apt/keyrings || true
+                                curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg || true
+                                chmod a+r /etc/apt/keyrings/docker.gpg || true
+                                echo \
+                                "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+                                "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                                tee /etc/apt/sources.list.d/docker.list > /dev/null || true
+                                apt-get update || true
+                                apt-get install -y docker-ce-cli || true
+                            '''
                     def jarFile = sh(script: "find build/libs -name '*.jar' | head -n 1", returnStdout: true).trim()
                     if (!fileExists(jarFile)) {
                         error("JAR file not found! Ensure the build step produces a JAR.")
