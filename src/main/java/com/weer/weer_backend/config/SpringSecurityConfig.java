@@ -42,7 +42,7 @@ public class SpringSecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/**", "/auth/**", "swagger-ui/**", "/v3/api-docs/**",
-                "/actuator/prometheus", "**").permitAll()
+                "/actuator/prometheus", "**", "/actuator/health").permitAll()
             .anyRequest().authenticated())
         .exceptionHandling(handling -> handling
             .authenticationEntryPoint((request, response, authException) -> {
