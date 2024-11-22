@@ -77,12 +77,11 @@ pipeline {
         stage('Upload Image to ECR') {
                     steps {
                         script {
-                            withAWS(credentials: 'aws-credentials', region: 'ap-northeast-2') {
-                                sh """
-                                    aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
-                                    docker push ${IMAGE_TAG}
-                                """
-                            }
+                            // AWS CLI를 사용하여 ECR 로그인
+                            sh """
+                                aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+                                docker push ${IMAGE_TAG}
+                            """
                         }
                     }
                 }
