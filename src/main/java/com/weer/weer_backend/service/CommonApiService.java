@@ -2,19 +2,17 @@ package com.weer.weer_backend.service;
 
 import com.weer.weer_backend.constants.DistrictConstants;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class CommonApiService {
@@ -37,7 +35,7 @@ public class CommonApiService {
         this.eventPublisher = eventPublisher;
     }
 
-    @Scheduled(fixedRate = 3600000) // 60분마다 호출
+    //@Scheduled(fixedRate = 3600000) // 60분마다 호출
     public void updateApiDataForAllDistricts() {
         System.out.println("서울특별시 모든 구에 대한 외부 API 데이터 갱신 중...");
         for (String district : districts) {

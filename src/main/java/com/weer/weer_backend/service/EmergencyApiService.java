@@ -10,18 +10,15 @@ import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 @Service
 public class EmergencyApiService {
@@ -40,7 +37,7 @@ public class EmergencyApiService {
     /**
      * DataUpdateCompleteEvent 발생 시 응급실 정보를 저장하는 메서드
      */
-    @EventListener
+    //@EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
         System.out.println("이벤트 수신: " + event.getMessage());
         getEmergencyInfoForAllDistricts();

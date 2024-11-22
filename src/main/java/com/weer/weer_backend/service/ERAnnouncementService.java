@@ -7,7 +7,6 @@ import com.weer.weer_backend.event.DataUpdateCompleteEvent;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -17,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,7 +27,6 @@ import org.w3c.dom.NodeList;
 public class ERAnnouncementService {
   private final ERAnnouncementRepository erAnnouncementRepository;
   private final HospitalRepository hospitalRepository;
-  private final EntityManager entityManager; // Inject EntityManager
 
   private final List<String> districts = DistrictConstants.DISTRICTS;
 
@@ -38,7 +35,7 @@ public class ERAnnouncementService {
   private final String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
   private final RestTemplate restTemplate;
 
-  @EventListener
+  //@EventListener
   public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
     System.out.println("이벤트 수신: " + event.getMessage());
     getHospitalInfoForAllDistricts();

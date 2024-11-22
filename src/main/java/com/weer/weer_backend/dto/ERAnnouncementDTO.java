@@ -25,6 +25,6 @@ public class ERAnnouncementDTO {
             .msgType(erAnnouncement.getMsgType())
             .message(erAnnouncement.getMessage())
             .diseaseType(erAnnouncement.getDiseaseType())
-            .createdAt(erAnnouncement.getCreatedAt().toString()).build();
+            .createdAt(erAnnouncement.getStartTime().toString()).build();
     }
 }

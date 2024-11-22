@@ -15,7 +15,6 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -34,7 +33,7 @@ public class EquipmentApiService {
     @Autowired
     private HospitalRepository hospitalRepository;
 
-    @EventListener
+    //@EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
         System.out.println("장비 데이터 이벤트 수신: " + event.getMessage());
         getEquipmentInfoForAllDistricts();
