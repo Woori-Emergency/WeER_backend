@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class CommonApiService {
 
+    private final SystemMetricsAutoConfiguration systemMetricsAutoConfiguration;
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
 
@@ -30,9 +33,10 @@ public class CommonApiService {
     private Map<String, String> districtApiResponses = new HashMap<>();
 
     @Autowired
-    public CommonApiService(RestTemplate restTemplate, ApplicationEventPublisher eventPublisher) {
+    public CommonApiService(RestTemplate restTemplate, ApplicationEventPublisher eventPublisher, SystemMetricsAutoConfiguration systemMetricsAutoConfiguration) {
         this.restTemplate = restTemplate;
         this.eventPublisher = eventPublisher;
+        this.systemMetricsAutoConfiguration = systemMetricsAutoConfiguration;
     }
 
     //@Scheduled(fixedRate = 3600000) // 60분마다 호출
@@ -57,7 +61,8 @@ public class CommonApiService {
                 .build()
                 .toUri();
 
-        System.out.println("API 요청 URI: " + uri);
+        System.out.println("지역: " + stage2);
+        System.out.println("지역의 API 요청 URI: " + uri + " | 지역: " + stage2);
         return restTemplate.getForObject(uri, String.class);
     }
 

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Slf4j
@@ -70,9 +71,9 @@ public class HospitalApiService {
                 .toUri();
 
         // 요청 URI 출력
-        System.out.println("요청 URI: " + uri);
+        //System.out.println("요청 URI: " + uri);
         String xmlResponse = restTemplate.getForObject(uri, String.class);
-        System.out.println("API 응답: " + xmlResponse);
+        //System.out.println("API 응답: " + xmlResponse);
 
         try {
             // XML 문자열을 Document 객체로 파싱
@@ -90,33 +91,26 @@ public class HospitalApiService {
             // item 노드 리스트 가져오기
             NodeList items = doc.getElementsByTagName("item");
             for (int i = 0; i < items.getLength(); i++) {
-                String dutyAddr = XmlParsingUtils.getTextContentSafely(doc, "dutyAddr", i);
-                String dutyEmcls = XmlParsingUtils.getTextContentSafely(doc, "dutyEmcls", i);
-                String dutyEmclsName = XmlParsingUtils.getTextContentSafely(doc, "dutyEmclsName", i);
-                String dutyName = XmlParsingUtils.getTextContentSafely(doc, "dutyName", i);
-                String dutyTel1 = XmlParsingUtils.getTextContentSafely(doc, "dutyTel1", i);
-                String dutyTel3 = XmlParsingUtils.getTextContentSafely(doc, "dutyTel3", i);
-                String hpid = XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
-                String latitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lat", i);
-                String longitude = XmlParsingUtils.getTextContentSafely(doc, "wgs84Lon", i);
+                Node itemNode = items.item(i);  // 각 <item> 노드
+                String dutyAddr = XmlParsingUtils.getTextContentSafely(itemNode, "dutyAddr");
+                String dutyEmcls = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmcls");
+                String dutyEmclsName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmclsName");
+                String dutyName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyName");
+                String dutyTel1 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel1");
+                String dutyTel3 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel3");
+                String hpid = XmlParsingUtils.getTextContentSafely(itemNode, "hpid");
+                String latitude = XmlParsingUtils.getTextContentSafely(itemNode, "wgs84Lat");
+                String longitude = XmlParsingUtils.getTextContentSafely(itemNode, "wgs84Lon");
 
                 // city와 state를 address에서 추출하는 로직
                 String city = parseCityFromAddress(dutyAddr);
                 String state = parseStateFromAddress(dutyAddr);
 
-                Hospital hospital = Hospital.builder()
-                        .hpid(hpid)
-                        .name(dutyName)
-                        .address(dutyAddr)
-                        .city(city)
-                        .state(state)
-                        .tel(dutyTel1)
-                        .erTel(dutyTel3)
-                        .latitude(latitude != null ? Double.parseDouble(latitude) : null)
-                        .longitude(longitude != null ? Double.parseDouble(longitude) : null)
-                        .build();
+                if (city == null || state == null) {
+                    System.out.println("[WARN] Unable to parse city/state from address: " + dutyAddr);
+                }
 
-                // hpid로 병원 정보를 저장하거나 업데이트하는 메서드 호출
+                // 병원 데이터 저장 또는 업데이트
                 saveOrUpdateHospital(hpid, dutyName, dutyAddr, city, state, dutyTel1, dutyTel3, latitude, longitude);
             }
 

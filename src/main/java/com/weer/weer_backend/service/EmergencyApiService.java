@@ -16,8 +16,10 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
@@ -37,9 +39,9 @@ public class EmergencyApiService {
     /**
      * DataUpdateCompleteEvent 발생 시 응급실 정보를 저장하는 메서드
      */
-    //@EventListener
+    @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
-        System.out.println("이벤트 수신: " + event.getMessage());
+        System.out.println("응급실 데이터 이벤트 수신: " + event.getMessage());
         getEmergencyInfoForAllDistricts();
     }
 
@@ -70,23 +72,31 @@ public class EmergencyApiService {
 
                 NodeList items = doc.getElementsByTagName("item");
                 for (int i = 0; i < items.getLength(); i++) {
-                    String hpid =  XmlParsingUtils.getTextContentSafely(doc, "hpid", i);
-                    Integer hvec = XmlParsingUtils.parseIntegerSafely(doc, "hvec", i);
-                    Integer hv27 = XmlParsingUtils.parseIntegerSafely(doc, "hv27", i);
-                    Integer hv29 = XmlParsingUtils.parseIntegerSafely(doc, "hv29", i);
-                    Integer hv30 = XmlParsingUtils.parseIntegerSafely(doc, "hv30", i);
-                    Integer hv28 = XmlParsingUtils.parseIntegerSafely(doc, "hv28", i);
-                    Integer hv15 = XmlParsingUtils.parseIntegerSafely(doc, "hv15", i);
-                    Integer hv16 = XmlParsingUtils.parseIntegerSafely(doc, "hv16", i);
-                    Integer hvs01 = XmlParsingUtils.parseIntegerSafely(doc, "hvs01", i);
-                    Integer hvs59 = XmlParsingUtils.parseIntegerSafely(doc, "hvs59", i);
-                    Integer hvs52 = XmlParsingUtils.parseIntegerSafely(doc, "hvs52", i);
-                    Integer hvs51 = XmlParsingUtils.parseIntegerSafely(doc, "hvs51", i);
-                    Integer hvs02 = XmlParsingUtils.parseIntegerSafely(doc, "hvs02", i);
-                    Integer hvs48 = XmlParsingUtils.parseIntegerSafely(doc, "hvs48", i);
-                    Integer hvs49 = XmlParsingUtils.parseIntegerSafely(doc, "hvs49", i);
-                    saveOrUpdateEmergency(hpid, hvec, hv27, hv29, hv30, hv28, hv15, hv16, hvs01, hvs59, hvs52, hvs51, hvs02, hvs48, hvs49);
+                    Node item = items.item(i);  // 현재 <item> 태그를 기준으로 파싱
+
+                    String hpid = XmlParsingUtils.getTextContentSafely(item, "hpid");
+                    Integer hvec = XmlParsingUtils.parseIntegerSafely(item, "hvec");
+                    Integer hv27 = XmlParsingUtils.parseIntegerSafely(item, "hv27");
+                    Integer hv29 = XmlParsingUtils.parseIntegerSafely(item, "hv29");
+                    Integer hv30 = XmlParsingUtils.parseIntegerSafely(item, "hv30");
+                    Integer hv28 = XmlParsingUtils.parseIntegerSafely(item, "hv28");
+                    Integer hv15 = XmlParsingUtils.parseIntegerSafely(item, "hv15");
+                    Integer hv16 = XmlParsingUtils.parseIntegerSafely(item, "hv16");
+                    Integer hvs01 = XmlParsingUtils.parseIntegerSafely(item, "hvs01");
+                    Integer hvs59 = XmlParsingUtils.parseIntegerSafely(item, "hvs59");
+                    Integer hvs03 = XmlParsingUtils.parseIntegerSafely(item, "hvs03");
+                    Integer hvs04 = XmlParsingUtils.parseIntegerSafely(item, "hvs04");
+                    Integer hvs02 = XmlParsingUtils.parseIntegerSafely(item, "hvs02");
+                    Integer hvs48 = XmlParsingUtils.parseIntegerSafely(item, "hvs48");
+                    Integer hvs49 = XmlParsingUtils.parseIntegerSafely(item, "hvs49");
+
+                    // 디버깅 출력 추가
+                    //System.out.println("Processing hospital: " + hpid);
+                    //System.out.println("hv15=" + hv15 + ", hvs48=" + hvs48 + ", hv16=" + hv16 + ", hvs49=" + hvs49);
+
+                    saveOrUpdateEmergency(hpid, hvec, hv27, hv29, hv30, hv28, hv15, hv16, hvs01, hvs59, hvs03, hvs04, hvs02, hvs48, hvs49);
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("XML 파싱 오류 발생");
@@ -96,7 +106,7 @@ public class EmergencyApiService {
     }
 
     private void saveOrUpdateEmergency(String hpid, Integer hvec, Integer hv27, Integer hv29, Integer hv30, Integer hv28, Integer hv15, Integer hv16,
-                                       Integer hvs01, Integer hvs59, Integer hvs52, Integer hvs51, Integer hvs02, Integer hvs48, Integer hvs49) {
+                                       Integer hvs01, Integer hvs59, Integer hvs03, Integer hvs04, Integer hvs02, Integer hvs48, Integer hvs49) {
         Hospital hospital = hospitalRepository.findByHpid(hpid)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_HOSPITAL));
 
@@ -111,8 +121,8 @@ public class EmergencyApiService {
             .hv16(hv16)
             .hvs01(hvs01)
             .hvs59(hvs59)
-            .hvs52(hvs52)
-            .hvs51(hvs51)
+            .hvs03(hvs03)
+            .hvs04(hvs04)
             .hvs02(hvs02)
             .hvs48(hvs48)
             .hvs49(hvs49).build();

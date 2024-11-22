@@ -58,11 +58,11 @@ public class Emergency extends BaseEntity {
     @Column(name = "HVS59")
     private Integer hvs59;  // 코로나 격리 병상 수 (기준)
 
-    @Column(name = "HVS52")
-    private Integer hvs52;  // 음압 격리 병상 수 (기준)
+    @Column(name = "HVS03")
+    private Integer hvs03;  // 음압 격리 병상 수 (기준)
 
-    @Column(name = "HVS51")
-    private Integer hvs51;  // 일반 격리 병상 수 (기준)
+    @Column(name = "HVS04")
+    private Integer hvs04;  // 일반 격리 병상 수 (기준)
 
     @Column(name = "HVS02")
     private Integer hvs02;  // 소아 격리 병상 수 (기준)
