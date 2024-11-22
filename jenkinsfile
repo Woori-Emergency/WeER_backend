@@ -75,19 +75,18 @@ pipeline {
         }
 
         stage('Upload Image to ECR') {
-            steps {
-                script {
-                    withAWS(credentials: AWS_CREDENTIALS_ID, region: 'ap-northeast-2') {
-                        sh """
-                            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
-                            docker tag ${IMAGE_TAG} ${IMAGE_TAG}
-                            docker push ${IMAGE_TAG}
-                        """
+                    steps {
+                        script {
+                            withAWS(credentials: 'aws-credentials', region: 'ap-northeast-2') {
+                                sh """
+                                    aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
+                                    docker push ${IMAGE_TAG}
+                                """
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
 
     post {
         always {
