@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,5 +71,15 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         userRepository.save(user); // 승인 여부 업데이트 후 저장
+    }
+
+    public String getHospitalName(Long id){
+        Optional<User> user =  userRepository.findFirstByUserId(id);
+        if(user.isPresent()){
+            return user.get().getOrganization();
+        }
+        else
+            return null;
+
     }
 }

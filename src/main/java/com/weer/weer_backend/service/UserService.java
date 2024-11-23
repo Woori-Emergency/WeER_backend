@@ -22,4 +22,6 @@ public interface UserService {
 
     // 회원가입 요청 승인/반려 처리
     void approveSignup(Long userId, Approve approve);
+
+    String getHospitalName(Long id);
 }
