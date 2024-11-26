@@ -16,3 +16,9 @@ springdoc:
     path: /v3/api-docs  # OpenAPI 문서의 경로
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI의 경로
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
