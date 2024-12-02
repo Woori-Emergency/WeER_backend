@@ -139,6 +139,7 @@ pipeline {
                         git config user.email "mandarin1999@naver.com"
                         git commit -am "Update image to ${ECR_URL}:${BUILD_NUMBER}"
                         git push https://Ungbbi:${GITOPS_REPO_CREDENTIALS}@github.com/Woori-Emergency/WeER_gitops test
+                        '''
                     }
                 }
             }
