@@ -63,7 +63,6 @@ pipeline {
                     script {
                         sh '''
                             chmod +x gradlew
-                            ./gradlew clean build --refresh-dependencies
                             ./gradlew clean build -x test --stacktrace
                         '''
                     }
