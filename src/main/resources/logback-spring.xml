@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 로그 포맷 정의 -->
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%X{traceId}] [%X{userIdx}] [%X{nftLog}] %magenta(%-4relative) --- [ %thread{10} ] %cyan(%logger{20}) : %msg%n"/>
+
+  <!-- 콘솔 appender 정의 -->
+  <appender name="DEFAULT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- JSON appender 정의 -->
+  <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+  </appender>
+
+  <!-- Local 프로파일: 콘솔 로그 출력 -->
+  <springProfile name="local">
+    <logger name="com.example" level="DEBUG"/>
+    <root level="INFO">
+      <appender-ref ref="DEFAULT_CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <!-- Dev, Staging, Live 프로파일: JSON 로그 출력 -->
+  <springProfile name="dev,stg,live">
+    <logger name="com.example" level="INFO"/>
+    <root level="INFO">
+      <appender-ref ref="JSON"/>
+    </root>
+  </springProfile>
+
+  <!-- 기본 Root 로거 설정 -->
+  <root level="INFO">
+    <appender-ref ref="JSON"/>
+  </root>
+
+</configuration>
