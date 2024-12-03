@@ -25,8 +25,6 @@ public class CommonApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
 
-    private final String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmRltmUsefulSckbdInfoInqire";
-
     private final RestTemplate restTemplate;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -55,6 +53,7 @@ public class CommonApiService {
     }
 
     private String fetchApiData(String stage1, String stage2, int pageNo, int numOfRows) {
+        String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmRltmUsefulSckbdInfoInqire";
         URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
                 .queryParam("serviceKey", SERVICE_KEY)
                 .queryParam("STAGE1", stage1)

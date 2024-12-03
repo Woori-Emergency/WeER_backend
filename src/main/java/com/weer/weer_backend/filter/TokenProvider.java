@@ -36,7 +36,7 @@ public class TokenProvider {
 
   private SecretKey getSigningKey() {
     return new SecretKeySpec(SECRETE_KEY.getBytes(StandardCharsets.UTF_8),
-        ((SecretKey)((SecretKeyBuilder) Jwts.SIG.HS256.key()).build()).getAlgorithm());
+        (((SecretKeyBuilder) Jwts.SIG.HS256.key()).build()).getAlgorithm());
   }
 
   public TokenDto generateToken(String loginId, Authentication authentication) {
