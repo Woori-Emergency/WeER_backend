@@ -133,13 +133,13 @@ pipeline {
             stage('Update K8S Manifest'){
                 steps{
                     dir('k8s-manifest'){
-                        git url: GITOPS_REPO_URL, branch: 'test', credentialsId: 'gitops-token'
+                        git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
                         sh '''
                         sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
                         git config user.name "Ungbbi"
                         git config user.email "mandarin1999@naver.com"
                         git commit -am "Update image to ${ECR_URL}:${BUILD_NUMBER}"
-                        git push https://Ungbbi:${GITOPS_REPO_CREDENTIALS}@github.com/Woori-Emergency/WeER_gitops test
+                        git push https://Ungbbi:${GITOPS_REPO_CREDENTIALS}@github.com/Woori-Emergency/WeER_gitops develop
                         '''
                     }
                 }
