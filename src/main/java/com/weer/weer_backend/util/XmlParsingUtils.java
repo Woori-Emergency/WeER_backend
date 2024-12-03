@@ -1,5 +1,6 @@
 package com.weer.weer_backend.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -8,6 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+@Slf4j
 public class XmlParsingUtils {
 
     // XML 문자열을 Document 객체로 파싱 (설정 변경 : 외부 엔티티 비활성화)
@@ -38,7 +40,7 @@ public class XmlParsingUtils {
         try {
             return (textContent != null && !textContent.trim().isEmpty()) ? Integer.parseInt(textContent.trim()) : null;
         } catch (NumberFormatException e) {
-            System.out.println("Failed to parse integer for tag: " + tagName + ", value: " + textContent);
+            log.info("Failed to parse integer for tag: " + tagName + ", value: " + textContent);
             return null;
         }
     }

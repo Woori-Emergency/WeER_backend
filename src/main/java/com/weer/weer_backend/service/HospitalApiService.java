@@ -36,7 +36,7 @@ public class HospitalApiService {
     // 애플리케이션 시작 시 한 번 실행되는 메서드
     @PostConstruct
     public void init() {
-        System.out.println("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
+        log.info("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
         start = System.currentTimeMillis();
         getHospitalInfoForAllDistricts();
     }
@@ -67,9 +67,7 @@ public class HospitalApiService {
                 .toUri();
 
         // 요청 URI 출력
-        //System.out.println("요청 URI: " + uri);
         String xmlResponse = restTemplate.getForObject(uri, String.class);
-        //System.out.println("API 응답: " + xmlResponse);
 
         try {
             // XML 문자열을 Document 객체로 파싱
