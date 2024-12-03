@@ -1,9 +1,7 @@
 package com.weer.weer_backend.dto;
 
-import lombok.Data;
-
 import java.time.LocalDateTime;
-import java.util.Date;
+import lombok.Data;
 
 @Data
 public class EmergencyDTO {
@@ -17,8 +15,8 @@ public class EmergencyDTO {
     private Integer hv16;              // 소아 일반 격리 병상 수
     private Integer hvs01;             // 일반 격리 병상 수 (기준)
     private Integer hvs59;             // 코로나 격리 병상 수 (기준)
-    private Integer hvs52;             // 음압 격리 병상 수 (기준)
-    private Integer hvs51;             // 일반 격리 병상 수 (기준)
+    private Integer hvs03;             // 음압 격리 병상 수 (기준)
+    private Integer hvs04;             // 일반 격리 병상 수 (기준)
     private Integer hvs02;             // 소아 격리 병상 수 (기준)
     private Integer hvs48;             // 소아 음압 격리 병상 수 (기준)
     private Integer hvs49;             // 소아 일반 격리 병상 수 (기준)

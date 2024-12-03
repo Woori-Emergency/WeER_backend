@@ -190,7 +190,6 @@ public class HospitalInfoService {
         log.warn("Failed to get HospitalDistanceDto: {}", e.getMessage());
       }
     }
-
     log.info("Completed fetching map info for all hospitals in range.");
     return rangeHospitalList;
   }
