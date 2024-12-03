@@ -4,25 +4,21 @@ import com.weer.weer_backend.constants.DistrictConstants;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.entity.Icu;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
-import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.repository.IcuRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +26,6 @@ public class IcuApiService {
     private final CommonApiService commonApiService;
     private final IcuRepository icuRepository;
     private final HospitalRepository hospitalRepository;
-
-    private final List<String> districts = DistrictConstants.DISTRICTS;
 
     @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
@@ -41,7 +35,7 @@ public class IcuApiService {
 
     @Transactional
     public String getIcuInfoForAllDistricts() {
-        for (String district : districts) {
+        for (String district : DistrictConstants.DISTRICTS) {
             String xmlResponse = commonApiService.getCachedApiResponseForDistrict(district);
             if (xmlResponse == null) {
                 System.out.println(district + " 데이터가 아직 캐싱되지 않았습니다.");

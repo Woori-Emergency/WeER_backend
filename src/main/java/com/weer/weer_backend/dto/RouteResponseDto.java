@@ -1,11 +1,8 @@
 package com.weer.weer_backend.dto;
 
+import lombok.*;
+
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @ToString
 @Getter

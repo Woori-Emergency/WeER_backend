@@ -1,11 +1,11 @@
 package com.weer.weer_backend.controller;
 
 import com.weer.weer_backend.dto.ApiResponse;
+import com.weer.weer_backend.service.HospitalApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.weer.weer_backend.service.HospitalApiService;
 
 @Slf4j
 @RestController

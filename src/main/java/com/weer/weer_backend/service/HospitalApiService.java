@@ -6,17 +6,8 @@ import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +16,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,6 @@ public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
     private long start;
-    private final List<String> districts = DistrictConstants.DISTRICTS;
 
     private final RestTemplate restTemplate;
     private final HospitalRepository hospitalRepository;
@@ -50,7 +46,7 @@ public class HospitalApiService {
         int pageNo = 1;
         int numOfRows = 10;
         String stage1 = "서울특별시";
-        for (String stage2 : districts) {
+        for (String stage2 : DistrictConstants.DISTRICTS) {
             getHospitalInfoAndSave(stage1, stage2, pageNo, numOfRows);
         }
         long end = System.currentTimeMillis();

@@ -1,24 +1,16 @@
 package com.weer.weer_backend.controller;
 
-import com.weer.weer_backend.dto.ApiResponse;
-import com.weer.weer_backend.dto.PatientConditionDTO;
-import com.weer.weer_backend.dto.PatientConditionResponseDTO;
-import com.weer.weer_backend.dto.ReservationDTO;
-import com.weer.weer_backend.dto.SecurityUser;
+import com.weer.weer_backend.dto.*;
 import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.service.PatientService;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class PatientController {

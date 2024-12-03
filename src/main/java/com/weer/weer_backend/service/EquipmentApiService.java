@@ -8,18 +8,17 @@ import com.weer.weer_backend.repository.EquipmentRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import javax.xml.parsers.DocumentBuilder;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +27,6 @@ public class EquipmentApiService {
     private final CommonApiService commonApiService;
     private final EquipmentRepository equipmentRepository;
     private final HospitalRepository hospitalRepository;
-
-    private static final List<String> districts = DistrictConstants.DISTRICTS;
 
 
     @EventListener
@@ -40,7 +37,7 @@ public class EquipmentApiService {
 
     @Transactional
     public String getEquipmentInfoForAllDistricts() {
-        for (String district : districts) {
+        for (String district : DistrictConstants.DISTRICTS) {
             String xmlResponse = commonApiService.getCachedApiResponseForDistrict(district);
             if (xmlResponse == null) {
                 System.out.println(district + " 데이터가 아직 캐싱되지 않았습니다.");

@@ -1,10 +1,5 @@
 package com.weer.weer_backend.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-
 import com.weer.weer_backend.dto.HospitalDistanceDto;
 import com.weer.weer_backend.dto.HospitalFilterDto;
 import com.weer.weer_backend.dto.MapInfoResponseDto;
@@ -13,9 +8,6 @@ import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +15,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+
 @ExtendWith(MockitoExtension.class)
-public class HospitalInfoServiceTest {
+class HospitalInfoServiceTest {
 
   @Mock
   private HospitalRepository hospitalRepository;

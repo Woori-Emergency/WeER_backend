@@ -1,8 +1,9 @@
 package com.weer.weer_backend.dto;
 
-import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Objects;
 
 @Getter
 @Builder

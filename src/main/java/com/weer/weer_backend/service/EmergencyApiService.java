@@ -10,11 +10,6 @@ import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -22,14 +17,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @RequiredArgsConstructor
 public class EmergencyApiService {
     private final CommonApiService commonApiService;
     private final EmergencyRepository emergencyRepository;
     private final HospitalRepository hospitalRepository;
-
-    private static final List<String> districts = DistrictConstants.DISTRICTS;
     // 생성자를 통한 의존성 주입
 
     /**
@@ -47,7 +44,7 @@ public class EmergencyApiService {
      */
     @Transactional
     public String getEmergencyInfoForAllDistricts() {
-        for (String district : districts) {
+        for (String district : DistrictConstants.DISTRICTS) {
             String xmlResponse = commonApiService.getCachedApiResponseForDistrict(district);
             if (xmlResponse == null) {
                 System.out.println(district + " 데이터가 아직 캐싱되지 않았습니다.");

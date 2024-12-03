@@ -10,4 +10,8 @@ public class DistrictConstants {
             "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구",
             "용산구", "은평구", "종로구", "중구", "중랑구"
     );
+
+    private DistrictConstants() {
+        // 인스턴스화를 막기 위해 생성자를 private로 설정
+    }
 }

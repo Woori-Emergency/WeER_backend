@@ -1,6 +1,5 @@
 package com.weer.weer_backend.service;
 
-import com.weer.weer_backend.dto.LoginForm;
 import com.weer.weer_backend.dto.UserDTO;
 
 public interface LoginService {

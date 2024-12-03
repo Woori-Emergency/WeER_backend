@@ -1,11 +1,5 @@
 package com.weer.weer_backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.weer.weer_backend.dto.PatientConditionResponseDTO;
 import com.weer.weer_backend.dto.ReservationDTO;
 import com.weer.weer_backend.dto.ReservationRequestDto;
@@ -15,15 +9,19 @@ import com.weer.weer_backend.enums.ConsciousnessLevel;
 import com.weer.weer_backend.enums.ReservationStatus;
 import com.weer.weer_backend.repository.PatientConditionRepository;
 import com.weer.weer_backend.repository.ReservationRepository;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class ReservationServiceTest {
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+class ReservationServiceTest {
 
   @Mock
   private ReservationRepository reservationRepository;

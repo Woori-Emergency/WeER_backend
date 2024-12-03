@@ -6,8 +6,19 @@ import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -15,19 +26,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 @Slf4j
 @EnableScheduling  // 스케줄링 활성화
@@ -37,7 +35,6 @@ public class ERAnnouncementService {
 
   private final ERAnnouncementRepository erAnnouncementRepository;
   private final HospitalRepository hospitalRepository;
-  private final List<String> districts = DistrictConstants.DISTRICTS;
 
   @Value("${OPENAPI_SERVICE_KEY}")
   private String SERVICE_KEY;
@@ -56,7 +53,7 @@ public class ERAnnouncementService {
     int pageNo = 1;
     int numOfRows = 10;
     String stage1 = "서울특별시";
-    for (String stage2 : districts) {
+    for (String stage2 : DistrictConstants.DISTRICTS) {
       getErAnnouncement(stage1, stage2, pageNo, numOfRows);
     }
   }
