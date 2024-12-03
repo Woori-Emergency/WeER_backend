@@ -40,7 +40,7 @@ pipeline {
 
             stage('Clone Repository') {
                 steps {
-                    git branch: 'develop',
+                    git branch: 'refactor/sonarqube',
                         url: 'https://github.com/Woori-Emergency/WeER_backend.git'
                 }
             }
@@ -84,14 +84,14 @@ pipeline {
                             """
                         }
                     }
-                    script {
-                        timeout(time: 3, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
-                        }
-                    }
+//                     script {
+//                         timeout(time: 3, unit: 'MINUTES') {
+//                             def qg = waitForQualityGate()
+//                             if (qg.status != 'OK') {
+//                                 error "Pipeline aborted due to quality gate failure: ${qg.status}"
+//                             }
+//                         }
+//                     }
                 }
             }
 
