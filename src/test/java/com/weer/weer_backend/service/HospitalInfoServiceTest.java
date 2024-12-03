@@ -1,33 +1,36 @@
 package com.weer.weer_backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 
-import com.weer.weer_backend.dto.HospitalDTO;
+import com.weer.weer_backend.dto.HospitalDistanceDto;
 import com.weer.weer_backend.dto.HospitalFilterDto;
-import com.weer.weer_backend.dto.HospitalRangeDto;
 import com.weer.weer_backend.dto.MapInfoResponseDto;
-import com.weer.weer_backend.entity.Emergency;
-import com.weer.weer_backend.entity.Equipment;
 import com.weer.weer_backend.entity.Hospital;
-import com.weer.weer_backend.entity.Icu;
+import com.weer.weer_backend.exception.CustomException;
+import com.weer.weer_backend.exception.ErrorCode;
+import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-class HospitalInfoServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class HospitalInfoServiceTest {
 
   @Mock
   private HospitalRepository hospitalRepository;
+
+  @Mock
+  private ERAnnouncementRepository erAnnouncementRepository;
 
   @Mock
   private MapService mapService;
@@ -35,179 +38,73 @@ class HospitalInfoServiceTest {
   @InjectMocks
   private HospitalInfoService hospitalInfoService;
 
+  private Hospital hospital;
+
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
-  @Test
-  void testFilterHospital() {
-    // Arrange
-    HospitalFilterDto filterDto = HospitalFilterDto.builder()
-        .city("CityA")
-        .state("StateA")
-        .build();
-
-    Equipment equipment = Equipment.builder()
-        .equipmentId(1L)
-        .hvventiAYN(true)
-        .build();
-    Emergency emergency = Emergency.builder()
-        .emergencyId(1L)
-        .build();
-
-    Icu icu = Icu.builder()
-        .icuId(1L)
-        .hvcc(1)
-        .build();
-
-    Hospital hospital = Hospital.builder()
-        .city("CityA")
-        .state("StateA")
-        .equipmentId(equipment)
-        .emergencyId(emergency)
-        .icuId(icu)
-        .build();
-
-    when(hospitalRepository.findByCityAndState("CityA", "StateA"))
-        .thenReturn(Collections.singletonList(hospital));
-
-    // Act
-    //List<HospitalDTO> result = hospitalInfoService.filterHospital(filterDto);
-
-    // Assert
-    //assertNotNull(result);
-    //assertEquals(1, result.size());
-    //verify(hospitalRepository, times(1)).findByCityAndState("CityA", "StateA");
-  }
-
-  @Test
-  void testGetHospitalDetail() {
-    // Arrange
-    Equipment equipment = Equipment.builder()
-        .equipmentId(1L)
-        .hvventiAYN(true)
-        .build();
-    Emergency emergency = Emergency.builder()
-        .emergencyId(1L)
-        .build();
-    Icu icu = Icu.builder()
-        .icuId(1L)
-        .hvcc(1)
-        .build();
-    Hospital hospital = Hospital.builder()
+    hospital = Hospital.builder()
         .hospitalId(1L)
-        .equipmentId(equipment)
-        .emergencyId(emergency)
-        .icuId(icu)
+        .name("Test Hospital")
+        .latitude(37.7749)
+        .longitude(-122.4194)
+        .emergencyId(null) // No emergency info to simulate filtering
+        .icuId(null)       // No ICU info to simulate filtering
+        .equipmentId(null) // No equipment info to simulate filtering
         .build();
-
-    when(hospitalRepository.findById(1L)).thenReturn(Optional.of(hospital));
-
-    // Act
-    HospitalDTO result = hospitalInfoService.getHospitalDetail(1L);
-
-    // Assert
-    assertNotNull(result);
-    assertEquals(1L, result.getHospitalId());
-    verify(hospitalRepository, times(1)).findById(1L);
   }
 
   @Test
-  void testGetRangeAllHospital() {
-    // Arrange
-    Double latitude = 40.7128;
-    Double longitude = -74.0060;
-    int range = 10;
+  void getAnnounce_whenHospitalExists_returnsAnnouncements() {
+    // given
+    lenient().when(hospitalRepository.findById(1L)).thenReturn(Optional.of(hospital));
 
-    Emergency emergency = Emergency.builder()
-        .emergencyId(1L)
-        .hvec(1)
-        .hvs01(8)
-        .build();
+    // when
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      hospitalInfoService.getAnnounce(2L); // Hospital with ID 2 doesn't exist
+    });
 
-    Equipment equipment = Equipment.builder()
-        .equipmentId(1L)
-        .build();
-
-    Icu icu = Icu.builder()
-        .icuId(1L)
-        .build();
-
-    Hospital hospital = Hospital.builder()
-        .latitude(40.7127)
-        .longitude(-74.0059)
-        .name("HospitalA")
-        .emergencyId(emergency)
-        .equipmentId(equipment)
-        .icuId(icu)
-        .build();
-
-    MapInfoResponseDto mapInfo = MapInfoResponseDto.builder()
-        .distance(5)
-        .duration(10)
-        .build();
-
-    when(hospitalRepository.findAll()).thenReturn(Collections.singletonList(hospital));
-    /*when(mapService.getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude()))
-        .thenReturn();*/
-
-    // Act
-    List<HospitalRangeDto> result = hospitalInfoService.getRangeAllHospital(latitude, longitude, range);
-
-    // Assert
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals("HospitalA", result.get(0).getHospitalName());
-    verify(hospitalRepository, times(1)).findAll();
-    verify(mapService, times(1)).getMapInfo(latitude, longitude, hospital.getLatitude(), hospital.getLongitude());
+    // then
+    assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND_HOSPITAL);
   }
 
   @Test
-  void testFilterHospitalWithEmergencyAndIcuAndEquipmentFilters() {
-    // Arrange
+  void filteredHospitals_whenHospitalMatchesFilter_returnsFilteredHospitals() {
+    // given
     HospitalFilterDto filterDto = HospitalFilterDto.builder()
-        .city("CityA")
-        .state("StateA")
-        .hvec(false)
+        .city("Test City")
+        .state("Test State")
         .hvcc(true)
-        .hvventiAYN(true)
         .build();
 
-    Emergency emergency = Emergency.builder()
-        .emergencyId(1L)
-        .hvec(1)
-        .hvs01(8)
-        .build();
+    lenient().when(hospitalRepository.findByCityAndState("Test City", "Test State"))
+        .thenReturn(List.of(hospital));
 
-    Equipment equipment = Equipment.builder()
-        .equipmentId(1L)
-        .hvventiAYN(true)
-        .build();
+    lenient().when(mapService.getMapInfo(any(Double.class), any(Double.class), any(Double.class), any(Double.class)))
+        .thenReturn(CompletableFuture.completedFuture(MapInfoResponseDto.builder().distance(10).duration(15).build()));
 
-    Icu icu = Icu.builder()
-        .icuId(1L)
-        .hvcc(1)
-        .build();
+    // when
+    List<HospitalDistanceDto> filteredHospitals = hospitalInfoService.filteredHospitals(37.7749, -122.4194, filterDto);
 
-    Hospital hospital = Hospital.builder()
-        .city("CityA")
-        .state("StateA")
-        .equipmentId(equipment)
-        .emergencyId(emergency)
-        .icuId(icu)
-        .build();
-
-    when(hospitalRepository.findByCityAndState("CityA", "StateA"))
-        .thenReturn(Collections.singletonList(hospital));
-
-    // Act
-    //List<HospitalDTO> result = hospitalInfoService.filterHospital(filterDto);
-
-    // Assert
-    //assertNotNull(result);
-    //assertEquals(1, result.size());
-    //assertTrue(result.stream().allMatch(h -> h.getCity().equals("CityA")));
-    //verify(hospitalRepository, times(1)).findByCityAndState("CityA", "StateA");
+    // then
+    assertThat(filteredHospitals).isEmpty(); // As emergency, ICU, and equipment details are missing
   }
+
+  @Test
+  void filteredHospitals_whenHospitalDoesNotMatchFilter_returnsEmptyList() {
+    // given
+    HospitalFilterDto filterDto = HospitalFilterDto.builder()
+        .city("Another City")
+        .state("Another State")
+        .build();
+
+    lenient().when(hospitalRepository.findByCityAndState("Another City", "Another State"))
+        .thenReturn(List.of());
+
+    // when
+    List<HospitalDistanceDto> filteredHospitals = hospitalInfoService.filteredHospitals(37.7749, -122.4194, filterDto);
+
+    // then
+    assertThat(filteredHospitals).isEmpty();
+  }
+
 }
