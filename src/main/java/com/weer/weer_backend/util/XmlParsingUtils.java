@@ -4,8 +4,24 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.yaml.snakeyaml.parser.ParserException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class XmlParsingUtils {
+
+    // XML 문자열을 Document 객체로 파싱 (설정 변경 : 외부 엔티티 비활성화)
+    public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException{
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
+
+        // DocumentBuilder 생성 및 반환
+        return factory.newDocumentBuilder();
+    }
 
     public static String getTextContentSafely(Node item, String tagName) {
         NodeList nodeList = ((Element) item).getElementsByTagName(tagName);

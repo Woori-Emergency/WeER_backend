@@ -4,6 +4,7 @@ import com.weer.weer_backend.constants.DistrictConstants;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.entity.Icu;
 import com.weer.weer_backend.event.DataUpdateCompleteEvent;
+import com.weer.weer_backend.repository.EmergencyRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.repository.IcuRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -22,16 +25,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
+@RequiredArgsConstructor
 public class IcuApiService {
-
-    @Autowired
-    private CommonApiService commonApiService;
-
-    @Autowired
-    private IcuRepository icuRepository;
-
-    @Autowired
-    private HospitalRepository hospitalRepository;
+    private final CommonApiService commonApiService;
+    private final IcuRepository icuRepository;
+    private final HospitalRepository hospitalRepository;
 
     private final List<String> districts = DistrictConstants.DISTRICTS;
 
@@ -51,11 +49,7 @@ public class IcuApiService {
             }
 
             try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
-                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
                 String resultCode = doc.getElementsByTagName("resultCode").item(0).getTextContent();

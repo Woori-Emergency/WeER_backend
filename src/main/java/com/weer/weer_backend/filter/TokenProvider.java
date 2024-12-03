@@ -2,7 +2,6 @@ package com.weer.weer_backend.filter;
 
 
 import com.weer.weer_backend.dto.TokenDto;
-import com.weer.weer_backend.enums.Role;
 import com.weer.weer_backend.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

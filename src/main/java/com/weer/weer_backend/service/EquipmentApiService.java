@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import lombok.RequiredArgsConstructor;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -22,18 +25,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
+@RequiredArgsConstructor
 public class EquipmentApiService {
 
-    @Autowired
-    private CommonApiService commonApiService;
+    private final CommonApiService commonApiService;
+    private final EquipmentRepository equipmentRepository;
+    private final HospitalRepository hospitalRepository;
 
-    @Autowired
-    private EquipmentRepository equipmentRepository;
+    private static final List<String> districts = DistrictConstants.DISTRICTS;
 
-    private final List<String> districts = DistrictConstants.DISTRICTS;
-
-    @Autowired
-    private HospitalRepository hospitalRepository;
 
     @EventListener
     public void handleDataUpdateCompleteEvent(DataUpdateCompleteEvent event) {
@@ -51,11 +51,7 @@ public class EquipmentApiService {
             }
 
             try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
-                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
                 String resultCode = doc.getElementsByTagName("resultCode").item(0).getTextContent();

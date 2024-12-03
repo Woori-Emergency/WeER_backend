@@ -14,7 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -23,18 +24,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Service
+@RequiredArgsConstructor
 public class EmergencyApiService {
+    private final CommonApiService commonApiService;
+    private final EmergencyRepository emergencyRepository;
+    private final HospitalRepository hospitalRepository;
 
-    @Autowired
-    private CommonApiService commonApiService;
-
-    @Autowired
-    private EmergencyRepository emergencyRepository;
-
-    private final List<String> districts = DistrictConstants.DISTRICTS;
-
-    @Autowired
-    private HospitalRepository hospitalRepository;
+    private static final List<String> districts = DistrictConstants.DISTRICTS;
+    // 생성자를 통한 의존성 주입
 
     /**
      * DataUpdateCompleteEvent 발생 시 응급실 정보를 저장하는 메서드
@@ -59,11 +56,7 @@ public class EmergencyApiService {
             }
 
             try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
-                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
                 String resultCode = doc.getElementsByTagName("resultCode").item(0).getTextContent();

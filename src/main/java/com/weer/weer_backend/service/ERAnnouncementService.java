@@ -18,6 +18,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@Slf4j
 @EnableScheduling  // 스케줄링 활성화
 @Service
 @RequiredArgsConstructor
@@ -39,14 +41,13 @@ public class ERAnnouncementService {
 
   @Value("${OPENAPI_SERVICE_KEY}")
   private String SERVICE_KEY;
-  private final String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
-  private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
   // @PostConstruct 제거하고, 대신 @Scheduled 사용
 
   //@Scheduled(fixedRate = 3600000) // 60분마다 호출 (60분 = 3600000밀리초)
   public void scheduledTask() {
-    System.out.println("스케줄링 작업: 병원 공지 데이터를 60분마다 불러옵니다.");
+    log.info("스케줄링 작업: 병원 공지 데이터를 60분마다 불러옵니다.");
     getHospitalInfoForAllDistricts();
   }
 
@@ -66,7 +67,8 @@ public class ERAnnouncementService {
 
     for (Hospital hospital : hospitals) {
 
-      URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+        String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
+        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
               .queryParam("serviceKey", SERVICE_KEY)
               .queryParam("HPID", hospital.getHpid())
               .queryParam("pageNo", pageNo)
@@ -74,26 +76,21 @@ public class ERAnnouncementService {
               .encode(StandardCharsets.UTF_8)
               .build()
               .toUri();
-
-      System.out.println("요청 URI: " + uri); // API 호출 URI 로그 출력
+      log.info("요청 URI: " + uri);
       String xmlResponse = restTemplate.getForObject(uri, String.class);
-      System.out.println("API 응답: " + xmlResponse); // API 응답 로그 출력
+      log.info("API 응답: " + xmlResponse); // API 응답 로그 출력
 
       try {
         // XML 문자열을 Document 객체로 파싱 (설정 변경 : 외부 엔티티 비활성화)
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
-
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
+        DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
+          assert xmlResponse != null;
+          Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
         // 응답 코드 확인
         String resultCode = doc.getElementsByTagName("resultCode").item(0).getTextContent();
         if (!"00".equals(resultCode)) {
           String resultMsg = doc.getElementsByTagName("resultMsg").item(0).getTextContent();
-          System.out.println("API 호출 실패: " + resultMsg); // 실패 메시지 로그 추가
+          log.info("API 호출 실패: " + resultMsg); // 실패 메시지 로그 추가
           return "API 호출 실패: " + resultMsg;
         }
 
@@ -103,17 +100,9 @@ public class ERAnnouncementService {
           Node currentItem = items.item(i);
 
           // XmlParsingUtils를 사용하여 각 태그 값 추출
-          String rnum = XmlParsingUtils.getTextContentSafely(currentItem, "rnum");
-          String dutyAddr = XmlParsingUtils.getTextContentSafely(currentItem, "dutyAddr");
-          String dutyName = XmlParsingUtils.getTextContentSafely(currentItem, "dutyName");
-          String emcOrgCod = XmlParsingUtils.getTextContentSafely(currentItem, "emcOrgCod");
-          String hpid = XmlParsingUtils.getTextContentSafely(currentItem, "hpid");
           String symBlkMsg = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkMsg");
           String symBlkMsgTyp = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkMsgTyp");
           String symTypCod = XmlParsingUtils.getTextContentSafely(currentItem, "symTypCod");
-          String symTypCodMag = XmlParsingUtils.getTextContentSafely(currentItem, "symTypCodMag");
-          String symOutDspYon = XmlParsingUtils.getTextContentSafely(currentItem, "symOutDspYon");
-          String symOutDspMth = XmlParsingUtils.getTextContentSafely(currentItem, "symOutDspMth");
           String symBlkSttDtm = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkSttDtm");
           String symBlkEndDtm = XmlParsingUtils.getTextContentSafely(currentItem, "symBlkEndDtm");
 
@@ -122,7 +111,9 @@ public class ERAnnouncementService {
           LocalDateTime endTime = parseDateTime(symBlkEndDtm);
 
           // 로그 추가: 값들이 올바르게 추출되었는지 확인
-          System.out.println("Hospital: " + hospital.getName() + " | Start Time: " + startTime + " | End Time: " + endTime);
+          log.info("Hospital: " + hospital.getName() + " | Start Time: " + startTime + " | End Time: " + endTime);
+
+
 
           // ERAnnouncement 객체 생성 및 저장
           ERAnnouncement erAnnouncement = ERAnnouncement.builder()
@@ -135,13 +126,13 @@ public class ERAnnouncementService {
                   .build();
 
           // 로그 추가: 저장된 ERAnnouncement 값 확인
-          System.out.println("Saving ERAnnouncement: " + erAnnouncement);
+          log.info("Saving ERAnnouncement: " + erAnnouncement);
 
           // 실제로 저장되는지 확인
           erAnnouncementRepository.save(erAnnouncement);
         }
       } catch (Exception e) {
-        System.err.println("XML 파싱 오류: " + e.getMessage());
+        log.error("XML 파싱 오류: " + e.getMessage());
         e.printStackTrace();
       }
     }
@@ -156,7 +147,7 @@ public class ERAnnouncementService {
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
       return LocalDateTime.parse(dateTimeStr, formatter);
     } catch (DateTimeParseException e) {
-      System.err.println("Invalid date format: " + dateTimeStr);
+      log.error("Invalid date format: " + dateTimeStr);
       return null;
     }
   }

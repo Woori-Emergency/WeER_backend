@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +27,7 @@ import org.w3c.dom.NodeList;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
@@ -32,11 +35,8 @@ public class HospitalApiService {
     private long start;
     private final List<String> districts = DistrictConstants.DISTRICTS;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private HospitalRepository hospitalRepository;
+    private final RestTemplate restTemplate;
+    private final HospitalRepository hospitalRepository;
 
     // 애플리케이션 시작 시 한 번 실행되는 메서드
     @PostConstruct
@@ -77,11 +77,7 @@ public class HospitalApiService {
 
         try {
             // XML 문자열을 Document 객체로 파싱
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
             Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
             // 응답 코드 확인
@@ -96,8 +92,6 @@ public class HospitalApiService {
             for (int i = 0; i < items.getLength(); i++) {
                 Node itemNode = items.item(i);  // 각 <item> 노드
                 String dutyAddr = XmlParsingUtils.getTextContentSafely(itemNode, "dutyAddr");
-                String dutyEmcls = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmcls");
-                String dutyEmclsName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmclsName");
                 String dutyName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyName");
                 String dutyTel1 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel1");
                 String dutyTel3 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel3");
@@ -110,7 +104,7 @@ public class HospitalApiService {
                 String state = parseStateFromAddress(dutyAddr);
 
                 if (city == null || state == null) {
-                    System.out.println("[WARN] Unable to parse city/state from address: " + dutyAddr);
+                    log.info("[WARN] Unable to parse city/state from address: " + dutyAddr);
                 }
 
                 // 병원 데이터 저장 또는 업데이트

@@ -69,7 +69,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             failAuthenticationWithCustomException(request, response, ErrorCode.LOGIN_CHECK_FAIL, "Wrong ID/PW");
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
     }
   return null;
@@ -136,11 +136,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
   }
   private void failAuthenticationWithCustomException(HttpServletRequest request, HttpServletResponse response, ErrorCode errorCode, String message) throws IOException {
-    unsuccessfulAuthentication(request, response, new BadCredentialsException(message) {
-      {
-        initCause(new CustomException(errorCode));
-      }
-    });
+    BadCredentialsException badCredentialsException = new BadCredentialsException(message);
+    badCredentialsException.initCause(new CustomException(errorCode));
+    unsuccessfulAuthentication(request, response, badCredentialsException);
   }
 
 }
