@@ -120,7 +120,7 @@ pipeline {
                          sh """
                                 docker images
                                 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
-                                docker push ${IMAGE_TAG}
+                                docker push ${ECR_URL}:${BUILD_NUMBER}
                             """
                     }
                 }
