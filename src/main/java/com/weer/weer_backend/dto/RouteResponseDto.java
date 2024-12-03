@@ -13,7 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RouteResponseDto {
-  private String trans_Id;
+  private String transId;
   private List<RouteDto> routes;
 
   public MapInfoResponseDto to(){

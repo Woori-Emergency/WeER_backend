@@ -67,8 +67,8 @@ public class ERAnnouncementService {
 
     for (Hospital hospital : hospitals) {
 
-        String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
-        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+        String baseURL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
+        URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
               .queryParam("serviceKey", SERVICE_KEY)
               .queryParam("HPID", hospital.getHpid())
               .queryParam("pageNo", pageNo)

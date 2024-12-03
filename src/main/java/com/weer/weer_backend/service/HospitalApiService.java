@@ -31,7 +31,6 @@ import org.w3c.dom.NodeList;
 public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
     private String SERVICE_KEY;
-    private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
     private long start;
     private final List<String> districts = DistrictConstants.DISTRICTS;
 
@@ -60,7 +59,8 @@ public class HospitalApiService {
     }
     
     public String getHospitalInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
-        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+        String baseURL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
+        URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
                 .queryParam("serviceKey", SERVICE_KEY)
                 .queryParam("Q0", stage1)
                 .queryParam("Q1", stage2)

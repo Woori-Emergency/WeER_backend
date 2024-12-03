@@ -28,9 +28,7 @@ public class CommonApiService {
     private final RestTemplate restTemplate;
     private final ApplicationEventPublisher eventPublisher;
 
-    private static final List<String> districts = DistrictConstants.DISTRICTS;
-
-    private Map<String, String> districtApiResponses = new HashMap<>();
+        private Map<String, String> districtApiResponses = new HashMap<>();
 
     @Autowired
     public CommonApiService(RestTemplate restTemplate, ApplicationEventPublisher eventPublisher, SystemMetricsAutoConfiguration systemMetricsAutoConfiguration) {
@@ -53,8 +51,8 @@ public class CommonApiService {
     }
 
     private String fetchApiData(String stage1, String stage2, int pageNo, int numOfRows) {
-        String BASE_URL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmRltmUsefulSckbdInfoInqire";
-        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+        String baseURL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmRltmUsefulSckbdInfoInqire";
+        URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
                 .queryParam("serviceKey", SERVICE_KEY)
                 .queryParam("STAGE1", stage1)
                 .queryParam("STAGE2", stage2)
