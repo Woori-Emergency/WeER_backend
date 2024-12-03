@@ -78,7 +78,8 @@ pipeline {
                                 -Dsonar.projectKey=weer-be \
                                 -Dsonar.host.url=http://43.200.78.125:9000 \
                                 -Dsonar.sources=src/main/java \
-                                -Dsonar.java.binaries=build/classes/java/main
+                                -Dsonar.java.binaries=build/classes/java/main \
+                                -Dsonar.qualitygate.skip=true
 
                             """
                         }

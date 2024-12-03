@@ -41,7 +41,7 @@ public class LoginController {
 
     // 비동기식 ID 중복체크"
     @GetMapping("/check-login-id")
-    public ApiResponse<Boolean> checkLoginId(@RequestParam String loginId) throws Exception{
+    public ApiResponse<Boolean> checkLoginId(@RequestParam String loginId) {
         return ApiResponse.success(loginService.isLoginIdDuplicate(loginId));
     }
 
