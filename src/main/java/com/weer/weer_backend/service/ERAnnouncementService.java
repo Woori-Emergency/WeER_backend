@@ -80,8 +80,12 @@ public class ERAnnouncementService {
       System.out.println("API 응답: " + xmlResponse); // API 응답 로그 출력
 
       try {
-        // XML 문자열을 Document 객체로 파싱
+        // XML 문자열을 Document 객체로 파싱 (설정 변경 : 외부 엔티티 비활성화)
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
+
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 

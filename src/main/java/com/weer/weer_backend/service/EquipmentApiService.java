@@ -52,6 +52,9 @@ public class EquipmentApiService {
 
             try {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                factory.setFeature("http://xml.org/sax/features/external-general-entities", true);
+                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
