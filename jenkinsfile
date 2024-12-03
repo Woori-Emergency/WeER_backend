@@ -41,7 +41,7 @@ pipeline {
 
             stage('Clone Repository') {
                 steps {
-                    git branch: 'develop',
+                    git branch: 'chore/sonarqube',
                         url: 'https://github.com/Woori-Emergency/WeER_backend.git'
                 }
             }
