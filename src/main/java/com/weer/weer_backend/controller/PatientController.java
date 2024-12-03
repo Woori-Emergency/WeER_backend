@@ -9,7 +9,6 @@ import com.weer.weer_backend.entity.PatientCondition;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.service.PatientService;
-import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
