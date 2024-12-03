@@ -63,6 +63,7 @@ pipeline {
                     script {
                         sh '''
                             chmod +x gradlew
+                            ./gradlew clean build --refresh-dependencies
                             ./gradlew clean build -x test --stacktrace
                         '''
                     }
@@ -133,13 +134,16 @@ pipeline {
                 steps{
                     dir('k8s-manifest'){
                         git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
+                        withCredentials([usernamePassword(credentialsId: 'gitops-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PAT')]){
                         sh '''
-                        sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
-                        git config user.name "Ungbbi"
-                        git config user.email "mandarin1999@naver.com"
-                        git commit -am "Update image to ${ECR_URL}:${BUILD_NUMBER}"
-                        git push https://Ungbbi:${GITOPS_REPO_CREDENTIALS}@github.com/Woori-Emergency/WeER_gitops develop
+                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
+                            git config user.name "Ungbbi"
+                            git config user.email "mandarin1999@naver.com"
+                            git commit -am "Update image to ${ECR_URL}:${BUILD_NUMBER}"
+                            git push https://Ungbbi:${GITOPS_REPO_CREDENTIALS}@github.com/Woori-Emergency/WeER_gitops develop
                         '''
+                        }
+
                     }
                 }
             }
