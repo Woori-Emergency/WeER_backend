@@ -2,15 +2,14 @@ package com.weer.weer_backend.controller;
 
 import com.weer.weer_backend.dto.ApiResponse;
 import com.weer.weer_backend.service.EquipmentApiService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/equipment")
 public class EquipmentApiController {
-
-    @Autowired
-    private EquipmentApiService equipmentApiService;
+    private final EquipmentApiService equipmentApiService;
 
     /**
      * 서울특별시의 장비 정보를 외부 API에서 가져와 저장하는 엔드포인트

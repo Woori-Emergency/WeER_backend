@@ -30,8 +30,8 @@ public class TokenProvider {
   @Value("${spring.jwt.secret}")
   private String SECRETE_KEY;
   private static final String KEY_ROLE = "role";
-  private static final long ACCESS_TOKEN_DURATION_IN_SECOND = 1000 * 60 * 60 * 12;
-  private static final long REFRESH_TOKEN_DURATION_IN_SECOND = 1000 * 60 * 60 * 24 * 7;
+  private static final long ACCESS_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 12;
+  private static final long REFRESH_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 24 * 7;
   private final UserDetailsServiceImpl userDetailsService;
 
   private SecretKey getSigningKey() {
