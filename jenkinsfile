@@ -7,12 +7,12 @@ pipeline {
 
     environment {
         AWS_CREDENTIALS_ID = credentials('aws-credentials')
-        DOCKER_IMAGE_NAME =  credentials('DOCKER_IMAGE_NAME')
         DOCKER_CREDENTIALS_ID = credentials('DOCKER_CREDENTIALS_ID')
         SPRING_APPLICATION_SECRET = credentials('application-secret')
         JAVA_HOME = '/var/jenkins_home/tools/hudson.model.JDK/jdk21/amazon-corretto-21.0.5.11.1-linux-x64'
         ECR_URL = credentials('ECR_URL')
-        IMAGE_TAG = "${ECR_URL}/${DOCKER_IMAGE_NAME}:latest"
+        GITOPS_REPO_URL = credentials('gitops-repo')
+        GITOPS_REPO_CREDENTIALS = credentials('gitops-token')
     }
     stages {
             stage('Cleanup Workspace') {
@@ -68,6 +68,32 @@ pipeline {
                         }
                     }
 
+
+            stage('SonarQube Analysis') {
+                steps {
+                    script {
+                        withSonarQubeEnv(credentialsId: "SonarQube-Token", installationName: 'SonarServer') {
+                            sh """
+                            ./gradlew sonarqube --info \
+                                -Dsonar.projectKey=weer-be \
+                                -Dsonar.host.url=http://43.200.78.125:9000 \
+                                -Dsonar.sources=src/main/java \
+                                -Dsonar.java.binaries=build/classes/java/main
+
+                            """
+                        }
+                    }
+                    script {
+                        timeout(time: 3, unit: 'MINUTES') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
+                    }
+                }
+            }
+
             stage('Build Docker Image') {
                 steps {
                     script {
@@ -79,24 +105,39 @@ pipeline {
                         }
 
                         sh """
-                                        docker build -t ${IMAGE_TAG} \\
-                                            --build-arg JAR_FILE=${jarFile} \\
-                                            --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
-                                    """
-                                        }
-                                    }
-                                }
+                            docker build -t ${ECR_URL}:${BUILD_NUMBER} \\
+                                --build-arg JAR_FILE=${jarFile} \\
+                                --build-arg SECRET_FILE=src/main/resources/application-secret.yml .
+                        """
+                    }
+                }
+            }
 
             stage('Upload Image to ECR') {
                 steps {
                     script {
                          sh """
-                                        echo "ECR URL: ${ECR_URL}"
-                                        echo "Image tag: ${IMAGE_TAG}"
-                                        docker images
-                                        aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
-                                        docker push ${IMAGE_TAG}
-                                    """
+                                docker images
+                                aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
+                                docker push ${IMAGE_TAG}
+                            """
+                    }
+                }
+            }
+
+            stage('Update K8S Manifest'){
+                steps{
+                    dir('k8s-manifest'){
+                        git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
+                        withCredentials([usernamePassword(credentialsId: 'gitops-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PAT')]){
+                        sh '''
+                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
+                            git config user.name "Ungbbi"
+                            git config user.email "mandarin1999@naver.com"
+                            git commit -am "Image updated in ECR WeER:${BUILD_NUMBER}"
+                            git push https://Ungbbi:${GIT_PAT}@github.com/Woori-Emergency/WeER_gitops develop
+                        '''
+                        }
                     }
                 }
             }
