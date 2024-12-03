@@ -2,6 +2,7 @@ package com.weer.weer_backend.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -14,7 +15,11 @@ import org.springframework.context.annotation.Configuration;
         title = "Example API Docs",
         description = "Description",
         version = "v1"
-    )
+    ),
+    servers = {
+      @Server(url = "https://www.woorifisa3-weer-server.com", description = "개발 서버"),
+      @Server(url = "http://localhost:8080", description = "로컬 서버")
+    }
 )
 @Configuration
 public class SwaggerConfig {
