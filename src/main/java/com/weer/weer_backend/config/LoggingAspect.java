@@ -36,7 +36,13 @@ public class LoggingAspect {
     logger.info("Request URL: {}", httpServletRequest.getRequestURL());
     logger.info("HTTP Method: {}", httpServletRequest.getMethod());
     logger.info("Request Params: {}", httpServletRequest.getQueryString());
-    logger.info("Executing {}.{}() with arguments: {}", className, methodName, Arrays.toString(joinPoint.getArgs()));
+    if(logger.isInfoEnabled()){
+      logger.info("Executing {}.{}() with arguments: {}",
+              className,
+              methodName,
+              Arrays.toString(joinPoint.getArgs())
+      );
+    }
 
     long startTime = System.currentTimeMillis();
     Object result = joinPoint.proceed();

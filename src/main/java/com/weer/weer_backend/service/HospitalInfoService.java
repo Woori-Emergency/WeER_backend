@@ -34,7 +34,7 @@ public class HospitalInfoService {
     return erAnnouncementRepository.findAllByHospitalId(hospital)
         .stream()
         .map(ERAnnouncementDTO::from)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public List<HospitalDistanceDto> filteredHospitals(Double latitude, Double longitude
