@@ -72,10 +72,13 @@ pipeline {
                     script {
                         withSonarQubeEnv(credentialsId: "SonarQube-Token", installationName: 'SonarServer') {
                             sh """
+                            ./gradlew jacocoTestReport
                             ./gradlew sonarqube --info \
                                 -Dsonar.projectKey=weer-be \
                                 -Dsonar.host.url=http://43.200.78.125:9000 \
                                 -Dsonar.sources=src/main/java \
+                                -Dsonar.tests=src/test/java \
+                                -Dsonar.reportPath=build/jacoco/test.exec \
                                 -Dsonar.java.binaries=build/classes/java/main \
                                 -Dsonar.qualitygate.skip=true
 
