@@ -1,19 +1,9 @@
 package com.weer.weer_backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.weer.weer_backend.dto.MapInfoResponseDto;
 import com.weer.weer_backend.dto.RouteDto;
 import com.weer.weer_backend.dto.RouteResponseDto;
 import com.weer.weer_backend.dto.SummaryDto;
-import java.util.LinkedList;
-import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +11,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class MapServiceTest {
+import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+class MapServiceTest {
 
   @Mock
   private MapInterface mapInterface;

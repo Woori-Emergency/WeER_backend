@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RouteDto {
-  private int result_code;
-  private String result_msg;
+  private int resultCode;
+  private String resultMsg;
   private SummaryDto summary;
 }

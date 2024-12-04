@@ -1,26 +1,25 @@
 package com.weer.weer_backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.weer.weer_backend.dto.UserResponseDTO;
 import com.weer.weer_backend.dto.UserUpdateDTO;
 import com.weer.weer_backend.entity.User;
 import com.weer.weer_backend.enums.Approve;
 import com.weer.weer_backend.repository.UserRepository;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class UserServiceImplTest {
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class UserServiceImplTest {
 
   @Mock
   private UserRepository userRepository;

@@ -1,24 +1,21 @@
 package com.weer.weer_backend.service;
 
-import com.weer.weer_backend.dto.ERAnnouncementDTO;
-import com.weer.weer_backend.dto.HospitalDTO;
-import com.weer.weer_backend.dto.HospitalDistanceDto;
-import com.weer.weer_backend.dto.HospitalFilterDto;
-import com.weer.weer_backend.dto.HospitalRangeDto;
+import com.weer.weer_backend.dto.*;
 import com.weer.weer_backend.entity.Hospital;
 import com.weer.weer_backend.exception.CustomException;
 import com.weer.weer_backend.exception.ErrorCode;
 import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -37,7 +34,7 @@ public class HospitalInfoService {
     return erAnnouncementRepository.findAllByHospitalId(hospital)
         .stream()
         .map(ERAnnouncementDTO::from)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public List<HospitalDistanceDto> filteredHospitals(Double latitude, Double longitude

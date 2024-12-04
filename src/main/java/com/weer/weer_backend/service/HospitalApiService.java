@@ -6,15 +6,8 @@ import com.weer.weer_backend.repository.HospitalRepository;
 import com.weer.weer_backend.util.XmlParsingUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -23,25 +16,27 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
-    private String SERVICE_KEY;
-    private final String BASE_URL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
+    private String serviceKey;
     private long start;
-    private final List<String> districts = DistrictConstants.DISTRICTS;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private HospitalRepository hospitalRepository;
+    private final RestTemplate restTemplate;
+    private final HospitalRepository hospitalRepository;
 
     // 애플리케이션 시작 시 한 번 실행되는 메서드
     @PostConstruct
     public void init() {
-        System.out.println("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
+        log.info("애플리케이션 시작 시 병원 정보 가져오기 작업 실행");
         start = System.currentTimeMillis();
         getHospitalInfoForAllDistricts();
     }
@@ -51,17 +46,18 @@ public class HospitalApiService {
         int pageNo = 1;
         int numOfRows = 10;
         String stage1 = "서울특별시";
-        for (String stage2 : districts) {
+        for (String stage2 : DistrictConstants.DISTRICTS) {
             getHospitalInfoAndSave(stage1, stage2, pageNo, numOfRows);
         }
         long end = System.currentTimeMillis();
         long duration = end - start;
         log.info("duration: " + duration);
     }
-    
+
     public String getHospitalInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
-        URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL)
-                .queryParam("serviceKey", SERVICE_KEY)
+        String baseURL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
+        URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
+                .queryParam("serviceKey", serviceKey)
                 .queryParam("Q0", stage1)
                 .queryParam("Q1", stage2)
                 .queryParam("pageNo", pageNo)
@@ -71,14 +67,11 @@ public class HospitalApiService {
                 .toUri();
 
         // 요청 URI 출력
-        //System.out.println("요청 URI: " + uri);
         String xmlResponse = restTemplate.getForObject(uri, String.class);
-        //System.out.println("API 응답: " + xmlResponse);
 
         try {
             // XML 문자열을 Document 객체로 파싱
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XmlParsingUtils.createDocumentBuilder();
             Document doc = builder.parse(new ByteArrayInputStream(xmlResponse.getBytes(StandardCharsets.UTF_8)));
 
             // 응답 코드 확인
@@ -93,8 +86,6 @@ public class HospitalApiService {
             for (int i = 0; i < items.getLength(); i++) {
                 Node itemNode = items.item(i);  // 각 <item> 노드
                 String dutyAddr = XmlParsingUtils.getTextContentSafely(itemNode, "dutyAddr");
-                String dutyEmcls = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmcls");
-                String dutyEmclsName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyEmclsName");
                 String dutyName = XmlParsingUtils.getTextContentSafely(itemNode, "dutyName");
                 String dutyTel1 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel1");
                 String dutyTel3 = XmlParsingUtils.getTextContentSafely(itemNode, "dutyTel3");
@@ -107,7 +98,7 @@ public class HospitalApiService {
                 String state = parseStateFromAddress(dutyAddr);
 
                 if (city == null || state == null) {
-                    System.out.println("[WARN] Unable to parse city/state from address: " + dutyAddr);
+                    log.info("[WARN] Unable to parse city/state from address: " + dutyAddr);
                 }
 
                 // 병원 데이터 저장 또는 업데이트

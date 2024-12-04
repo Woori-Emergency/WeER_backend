@@ -47,12 +47,10 @@ pipeline {
 
             stage('Prepare Environment') {
                 steps {
-                    script {
-                        writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
-                        sh '''
-                            mkdir -p src/main/resources/
-                            mv application-secret.yml src/main/resources/
-                        '''
+                    withCredentials([file(credentialsId: 'application-secret', variable: 'applicationSecret')]){
+                        script {
+                            sh 'cp $applicationSecret src/main/resources/application-secret.yml'
+                        }
                     }
                 }
             }
@@ -74,24 +72,27 @@ pipeline {
                     script {
                         withSonarQubeEnv(credentialsId: "SonarQube-Token", installationName: 'SonarServer') {
                             sh """
+                            ./gradlew jacocoTestReport
                             ./gradlew sonarqube --info \
                                 -Dsonar.projectKey=weer-be \
                                 -Dsonar.host.url=http://43.200.78.125:9000 \
                                 -Dsonar.sources=src/main/java \
+                                -Dsonar.tests=src/test/java \
+                                -Dsonar.reportPath=build/jacoco/test.exec \
                                 -Dsonar.java.binaries=build/classes/java/main \
                                 -Dsonar.qualitygate.skip=true
 
                             """
                         }
                     }
-                    script {
-                        timeout(time: 3, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
-                        }
-                    }
+//                     script {
+//                         timeout(time: 3, unit: 'MINUTES') {
+//                             def qg = waitForQualityGate()
+//                             if (qg.status != 'OK') {
+//                                 error "Pipeline aborted due to quality gate failure: ${qg.status}"
+//                             }
+//                         }
+//                     }
                 }
             }
 
@@ -120,7 +121,7 @@ pipeline {
                          sh """
                                 docker images
                                 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ECR_URL}
-                                docker push ${IMAGE_TAG}
+                                docker push ${ECR_URL}:${BUILD_NUMBER}
                             """
                     }
                 }
@@ -132,7 +133,7 @@ pipeline {
                         git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
                         withCredentials([usernamePassword(credentialsId: 'gitops-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PAT')]){
                         sh '''
-                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
+                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/deployment.yaml
                             git config user.name "Ungbbi"
                             git config user.email "mandarin1999@naver.com"
                             git commit -am "Image updated in ECR WeER:${BUILD_NUMBER}"

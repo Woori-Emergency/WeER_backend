@@ -2,19 +2,9 @@ package com.weer.weer_backend.filter;
 
 
 import com.weer.weer_backend.dto.TokenDto;
-import com.weer.weer_backend.enums.Role;
 import com.weer.weer_backend.service.UserDetailsServiceImpl;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SecretKeyBuilder;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Date;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,21 +13,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
 
   @Value("${spring.jwt.secret}")
-  private String SECRETE_KEY;
+  private String secretKey;
   private static final String KEY_ROLE = "role";
-  private static final long ACCESS_TOKEN_DURATION_IN_SECOND = 1000 * 60 * 60 * 12;
-  private static final long REFRESH_TOKEN_DURATION_IN_SECOND = 1000 * 60 * 60 * 24 * 7;
+  private static final long ACCESS_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 12;
+  private static final long REFRESH_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 24 * 7;
   private final UserDetailsServiceImpl userDetailsService;
 
   private SecretKey getSigningKey() {
-    return new SecretKeySpec(SECRETE_KEY.getBytes(StandardCharsets.UTF_8),
-        ((SecretKey)((SecretKeyBuilder) Jwts.SIG.HS256.key()).build()).getAlgorithm());
+    return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
+        ((Jwts.SIG.HS256.key()).build()).getAlgorithm());
   }
 
   public TokenDto generateToken(String loginId, Authentication authentication) {

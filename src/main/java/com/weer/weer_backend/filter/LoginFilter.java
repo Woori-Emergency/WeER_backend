@@ -9,11 +9,6 @@ import com.weer.weer_backend.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -24,6 +19,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -69,7 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             failAuthenticationWithCustomException(request, response, ErrorCode.LOGIN_CHECK_FAIL, "Wrong ID/PW");
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
     }
   return null;
@@ -136,11 +137,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
   }
   private void failAuthenticationWithCustomException(HttpServletRequest request, HttpServletResponse response, ErrorCode errorCode, String message) throws IOException {
-    unsuccessfulAuthentication(request, response, new BadCredentialsException(message) {
-      {
-        initCause(new CustomException(errorCode));
-      }
-    });
+    BadCredentialsException badCredentialsException = new BadCredentialsException(message);
+    badCredentialsException.initCause(new CustomException(errorCode));
+    unsuccessfulAuthentication(request, response, badCredentialsException);
   }
 
 }

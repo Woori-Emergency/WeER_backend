@@ -1,11 +1,6 @@
 package com.weer.weer_backend.dto;
 
-import com.weer.weer_backend.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Builder

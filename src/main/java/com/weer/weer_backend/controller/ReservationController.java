@@ -22,9 +22,6 @@ public class ReservationController {
         this.reservationService = reservationService;
         this.userService = userService;
     }
-
-    // ToDo : 병원 예약 시스템 개발
-
     // 병원에서 승인
     /*
     ReservationStatus -> approve로 변경

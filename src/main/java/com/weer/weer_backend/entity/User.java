@@ -1,7 +1,7 @@
 package com.weer.weer_backend.entity;
 
-import com.weer.weer_backend.enums.Approve;
 import com.weer.weer_backend.dto.UserUpdateDTO;
+import com.weer.weer_backend.enums.Approve;
 import com.weer.weer_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
