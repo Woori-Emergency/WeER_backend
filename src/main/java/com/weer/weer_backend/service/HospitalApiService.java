@@ -27,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HospitalApiService {
     @Value("${OPENAPI_SERVICE_KEY}")
-    private String SERVICE_KEY;
+    private String serviceKey;
     private long start;
 
     private final RestTemplate restTemplate;
@@ -53,11 +53,11 @@ public class HospitalApiService {
         long duration = end - start;
         log.info("duration: " + duration);
     }
-    
+
     public String getHospitalInfoAndSave(String stage1, String stage2, int pageNo, int numOfRows) {
         String baseURL = "https://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytListInfoInqire";
         URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
-                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("serviceKey", serviceKey)
                 .queryParam("Q0", stage1)
                 .queryParam("Q1", stage2)
                 .queryParam("pageNo", pageNo)

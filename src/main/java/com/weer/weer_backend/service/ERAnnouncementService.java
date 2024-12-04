@@ -37,7 +37,7 @@ public class ERAnnouncementService {
   private final HospitalRepository hospitalRepository;
 
   @Value("${OPENAPI_SERVICE_KEY}")
-  private String SERVICE_KEY;
+  private String serviceKey;
     private final RestTemplate restTemplate;
 
   // @PostConstruct 제거하고, 대신 @Scheduled 사용
@@ -66,7 +66,7 @@ public class ERAnnouncementService {
 
         String baseURL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmSrsillDissMsgInqire";
         URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
-              .queryParam("serviceKey", SERVICE_KEY)
+              .queryParam("serviceKey", serviceKey)
               .queryParam("HPID", hospital.getHpid())
               .queryParam("pageNo", pageNo)
               .queryParam("numOfRows", numOfRows)

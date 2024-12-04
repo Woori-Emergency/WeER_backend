@@ -22,7 +22,7 @@ public class CommonApiService {
 
     private final SystemMetricsAutoConfiguration systemMetricsAutoConfiguration;
     @Value("${OPENAPI_SERVICE_KEY}")
-    private String SERVICE_KEY;
+    private String serviceKey;
 
     private final RestTemplate restTemplate;
     private final ApplicationEventPublisher eventPublisher;
@@ -52,7 +52,7 @@ public class CommonApiService {
     private String fetchApiData(String stage1, String stage2, int pageNo, int numOfRows) {
         String baseURL = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEmrrmRltmUsefulSckbdInfoInqire";
         URI uri = UriComponentsBuilder.fromHttpUrl(baseURL)
-                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("serviceKey", serviceKey)
                 .queryParam("STAGE1", stage1)
                 .queryParam("STAGE2", stage2)
                 .queryParam("pageNo", pageNo)

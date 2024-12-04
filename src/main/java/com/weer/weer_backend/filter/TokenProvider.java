@@ -25,15 +25,15 @@ import java.util.Date;
 public class TokenProvider {
 
   @Value("${spring.jwt.secret}")
-  private String SECRETE_KEY;
+  private String secretKey;
   private static final String KEY_ROLE = "role";
   private static final long ACCESS_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 12;
   private static final long REFRESH_TOKEN_DURATION_IN_SECOND = 1000L * 60 * 60 * 24 * 7;
   private final UserDetailsServiceImpl userDetailsService;
 
   private SecretKey getSigningKey() {
-    return new SecretKeySpec(SECRETE_KEY.getBytes(StandardCharsets.UTF_8),
-        (((SecretKeyBuilder) Jwts.SIG.HS256.key()).build()).getAlgorithm());
+    return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
+        ((Jwts.SIG.HS256.key()).build()).getAlgorithm());
   }
 
   public TokenDto generateToken(String loginId, Authentication authentication) {
