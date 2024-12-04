@@ -3,7 +3,6 @@ package com.weer.weer_backend.service;
 import com.weer.weer_backend.dto.UserDTO;
 
 public interface LoginService {
-//    public void authenticate(LoginForm loginForm) throws Exception;
 
     public void signUp(UserDTO userDTO);
 

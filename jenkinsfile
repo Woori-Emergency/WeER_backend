@@ -47,12 +47,10 @@ pipeline {
 
             stage('Prepare Environment') {
                 steps {
-                    script {
-                        writeFile file: 'application-secret.yml', text: SPRING_APPLICATION_SECRET
-                        sh '''
-                            mkdir -p src/main/resources/
-                            mv application-secret.yml src/main/resources/
-                        '''
+                    withCredentials([file(credentialsId: 'application-secret', variable: 'applicationSecret')]){
+                        script {
+                            sh 'cp $applicationSecret src/main/resources/application-secret.yml'
+                        }
                     }
                 }
             }
