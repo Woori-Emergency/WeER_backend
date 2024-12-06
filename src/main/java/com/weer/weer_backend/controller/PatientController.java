@@ -88,7 +88,8 @@ public class PatientController {
             @AuthenticationPrincipal SecurityUser user) {
         Long userId = user.getUser().getUserId();
         try {
-            List<PatientConditionResponseDTO> patients = patientService.getPatientConditionList(userId);
+            List<PatientConditionResponseDTO> patients = patientService.getPatientConditionList(userId).reversed();
+
             if (patients.isEmpty()) {
                 return ResponseEntity.ok(ApiResponse.<List<PatientConditionResponseDTO>>builder()
                         .status(HttpStatus.NO_CONTENT.value())
