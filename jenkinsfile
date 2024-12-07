@@ -131,8 +131,15 @@ pipeline {
                 steps{
                     dir('k8s-manifest'){
                         git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
+                        def currentSelector = sh(script: """
+                            grep 'version:' applications/weer/base/service.yaml | awk '{print \$2}'
+                        """, returnStdout: true).trim()
+
+                        def newSelector = (currentSelector == 'blue') ? 'green' : 'blue'
+                        echo "newSelector: ${newSelector}"
                         withCredentials([usernamePassword(credentialsId: 'gitops-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PAT')]){
                         sh '''
+                            sed -i 's/version: ${currentSelector}/version: ${newSelector}/g' applications/weer/base/service.yaml
                             sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/deployment.yaml
                             git config user.name "Ungbbi"
                             git config user.email "mandarin1999@naver.com"
