@@ -134,7 +134,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
                             sh """
                                 # GCR에 Docker 로그인
-                                docker login -u _json_key -p "$(cat /gcr-admin.json)" https://gcr.io
+                                docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
 
                                 # Docker 이미지를 GCR 형식으로 태깅
                                 docker tag ${ECR_URL}:${BUILD_NUMBER} gcr.io/${GCP_PROJECT_ID}/weer-be:latest
