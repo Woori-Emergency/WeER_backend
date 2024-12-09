@@ -13,7 +13,7 @@ pipeline {
         ECR_URL = credentials('ECR_URL')
         GITOPS_REPO_URL = credentials('gitops-repo')
         GITOPS_REPO_CREDENTIALS = credentials('gitops-token')
-        GCP_PROJECT_ID = credentials('gcp-project-id')
+        GCP_PROJECT_ID = credentials('gcr-admin')
     }
     stages {
             stage('Cleanup Workspace') {
@@ -131,18 +131,22 @@ pipeline {
             stage('Upload Image to GCR') {
                 steps {
                     script {
-                        withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
-                            sh """
-                                # GCR에 Docker 로그인
-                                docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
-
-                                # Docker 이미지를 GCR 형식으로 태깅
-                                docker tag ${ECR_URL}:${BUILD_NUMBER} gcr.io/${GCP_PROJECT_ID}/weer-be:latest
-
-                                # GCR에 이미지 푸시
-                                docker push gcr.io/${GCP_PROJECT_ID}/weer-be:latest
-                            """
-                        }
+                        docker.withRegistry('https://gcr.io','gcr-admin'){
+                            docker.image("gcr.io/${GCP_PROJECT_ID}/weer-be:latest").push()
+                            }
+//                         withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
+//                             sh """
+//                                 # GCR에 Docker 로그인
+//                                 gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+//                                 docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
+//
+//                                 # Docker 이미지를 GCR 형식으로 태깅
+//                                 docker tag ${ECR_URL}:${BUILD_NUMBER} gcr.io/${GCP_PROJECT_ID}/weer-be:latest
+//
+//                                 # GCR에 이미지 푸시
+//                                 docker push gcr.io/${GCP_PROJECT_ID}/weer-be:latest
+//                             """
+//                         }
                     }
                 }
             }
