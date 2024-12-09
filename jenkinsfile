@@ -131,7 +131,7 @@ pipeline {
             stage('Upload Image to GCR') {
                 steps {
                     script {
-                        withCredentials([file(credentialsId: 'jenkins-gcr-key', variable: 'GCP_KEY_FILE')]) {
+                        withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
                             sh """
                                 # GCR에 Docker 로그인
                                 cat $GCP_KEY_FILE | docker login -u _json_key --password-stdin https://gcr.io
