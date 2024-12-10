@@ -68,24 +68,24 @@ pipeline {
                     }
 
 
-//             stage('SonarQube Analysis') {
-//                 steps {
-//                     script {
-//                         withSonarQubeEnv(credentialsId: "SonarQube-Token", installationName: 'SonarServer') {
-//                             sh """
-//                             ./gradlew jacocoTestReport
-//                             ./gradlew sonarqube --info \
-//                                 -Dsonar.projectKey=weer-be \
-//                                 -Dsonar.host.url=http://43.200.78.125:9000 \
-//                                 -Dsonar.sources=src/main/java \
-//                                 -Dsonar.tests=src/test/java \
-//                                 -Dsonar.reportPath=build/jacoco/test.exec \
-//                                 -Dsonar.java.binaries=build/classes/java/main \
-//                                 -Dsonar.qualitygate.skip=true
-//
-//                             """
-//                         }
-//                     }
+            stage('SonarQube Analysis') {
+                steps {
+                    script {
+                        withSonarQubeEnv(credentialsId: "SonarQube-Token", installationName: 'SonarServer') {
+                            sh """
+                            # ./gradlew jacocoTestReport
+                            ./gradlew sonarqube --info \
+                                -Dsonar.projectKey=weer-be \
+                                -Dsonar.host.url=http://43.200.78.125:9000 \
+                                -Dsonar.sources=src/main/java \
+                            #    -Dsonar.tests=src/test/java \
+                            #    -Dsonar.reportPath=build/jacoco/test.exec \
+                                -Dsonar.java.binaries=build/classes/java/main \
+                                -Dsonar.qualitygate.skip=true
+
+                            """
+                        }
+                    }
 //                     script {
 //                         timeout(time: 3, unit: 'MINUTES') {
 //                             def qg = waitForQualityGate()
@@ -94,8 +94,8 @@ pipeline {
 //                             }
 //                         }
 //                     }
-//                 }
-//             }
+                }
+            }
 
             stage('Build Docker Image') {
                 steps {
@@ -131,22 +131,13 @@ pipeline {
             stage('Upload Image to GCR') {
                 steps {
                     script {
-                        docker.withRegistry('https://gcr.io','gcr-admin'){
-                            docker.image("gcr.io/${GCP_PROJECT_ID}/weer-be:latest").push()
-                            }
-//                         withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
-//                             sh """
-//                                 # GCR에 Docker 로그인
-//                                 gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
-//                                 docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
-//
-//                                 # Docker 이미지를 GCR 형식으로 태깅
-//                                 docker tag ${ECR_URL}:${BUILD_NUMBER} gcr.io/${GCP_PROJECT_ID}/weer-be:latest
-//
-//                                 # GCR에 이미지 푸시
-//                                 docker push gcr.io/${GCP_PROJECT_ID}/weer-be:latest
-//                             """
-//                         }
+                        withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
+                            sh """
+                                # GCR에 Docker 로그인
+                                gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+                                docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
+                            """
+                        }
                     }
                 }
             }
@@ -158,7 +149,7 @@ pipeline {
                         git url: GITOPS_REPO_URL, branch: 'develop', credentialsId: 'gitops-token'
                         withCredentials([usernamePassword(credentialsId: 'gitops-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PAT')]){
                         sh '''
-                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rollout.yaml
+                            sed -i "s|image: .*$|image: ${ECR_URL}:${BUILD_NUMBER}|" applications/weer/base/rolloutss.yaml
                             git config user.name "Ungbbi"
                             git config user.email "mandarin1999@naver.com"
                             git commit -am "Image updated in ECR WeER:${BUILD_NUMBER}"
