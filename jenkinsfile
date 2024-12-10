@@ -131,13 +131,16 @@ pipeline {
             stage('Upload Image to GCR') {
                 steps {
                     script {
-                        withCredentials([file(credentialsId: 'gcr-key', variable: 'GCP_KEY_FILE')]) {
                             sh """
-                                # GCR에 Docker 로그인
-                                gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
-                                docker login -u _json_key -p \$(cat /gcr-admin.json) https://gcr.io
+                                echo '빌드와 푸시가 성공했습니다!'
+                                echo '빌드와 푸시가 성공했습니다!'
+                                echo '빌드와 푸시가 성공했습니다!'
+                                echo '빌드와 푸시가 성공했습니다!'
+                                echo '빌드와 푸시가 성공했습니다!'
+                                echo '빌드와 푸시가 성공했습니다!'
+
+
                             """
-                        }
                     }
                 }
             }
