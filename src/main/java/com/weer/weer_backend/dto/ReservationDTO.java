@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import lombok.ToString;
 
 @Data
 @Builder
+@ToString
 public class ReservationDTO {
     private Long reservationId;
     private Long hospitalId;
     private Long patientconditionId;
     private ReservationStatus reservationStatus;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
 }
 

@@ -1,20 +1,41 @@
-version: '3.8'
-
 services:
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
     ports:
-      - "9090:9090"
+      - "8086:8086"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Prometheus 설정 파일
+      - influxdb_data:/var/lib/influxdb
+    environment:
+        - INFLUXDB_DB=k6
+        - INFLUXDB_ADMIN_USER=admin
+        - INFLUXDB_ADMIN_PASSWORD=admin123
+        - INFLUXDB_HTTP_AUTH_ENABLED=true
+    restart: unless-stopped
+    networks:
+        - k6
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
-    depends_on:
-      - prometheus
     ports:
-      - "3000:3000"
+      - "3000:3000" # Grafana의 기본 포트
+    depends_on:
+      - influxdb # InfluxDB가 먼저 시작되어야 함
+    volumes:
+      - grafana_data:/var/lib/grafana # 데이터 영구 저장
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin # Grafana 관리자 계정 사용자명
+      - GF_SECURITY_ADMIN_PASSWORD=admin123 # Grafana 관리자 계정 비밀번호
+      - GF_AUTH_ANONYMOUS_ENABLED=false # 익명 액세스 비활성화 (보안 강화)
+    restart: unless-stopped # Grafana 컨테이너가 실패 시 자동 재시작
+    networks:
+      - k6
+
+networks:
+  k6:
+    driver: bridge
+
+volumes:
+  influxdb_data:
+  grafana_data:

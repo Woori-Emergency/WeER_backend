@@ -8,6 +8,7 @@ import com.weer.weer_backend.repository.ERAnnouncementRepository;
 import com.weer.weer_backend.repository.HospitalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +26,6 @@ public class HospitalInfoService {
   private final MapService mapService;
   private final HospitalRepository hospitalRepository;
   private final ERAnnouncementRepository erAnnouncementRepository;
-
-  private static final double EARTH_RADIUS = 6371.0;
 
   public List<ERAnnouncementDTO> getAnnounce(long hospitalId) {
     Hospital hospital = hospitalRepository.findById(hospitalId)

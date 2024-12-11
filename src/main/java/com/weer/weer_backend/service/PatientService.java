@@ -64,7 +64,8 @@ public class PatientService {
 
     // 유저별 등록된 환자 정보 가져오기
     public List<PatientConditionResponseDTO> getPatientConditionList(Long userId) {
-        List<PatientCondition> patientConditions = patientConditionRepository.findAllByUserId(userId);
+        List<PatientCondition> patientConditions = patientConditionRepository.findAllByUserId(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PATIENT_NOT_FOUND));
         return patientConditions.stream()
                 .map(PatientConditionResponseDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -75,8 +76,6 @@ public class PatientService {
                 .hospitalId(reservation.getHospitalId())
                 .patientconditionId(reservation.getPatientconditionid())
                 .reservationStatus(reservation.getReservationStatus())
-                .createdAt(reservation.getCreatedAt())
-                .modifiedAt(reservation.getModifiedAt())
                 .build();
     }
 }

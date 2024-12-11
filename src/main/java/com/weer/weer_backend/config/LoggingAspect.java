@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Aspect
 @Component
@@ -30,25 +32,36 @@ public class LoggingAspect {
 
   @Around("controllerPointcut()")
   public Object logControllerRequests(ProceedingJoinPoint joinPoint) throws Throwable {
-    String methodName = joinPoint.getSignature().getName();
+    // Gather request details
+    String requestUrl = httpServletRequest.getRequestURL().toString();
+    String httpMethod = httpServletRequest.getMethod();
+    String queryParams = httpServletRequest.getQueryString();
     String className = joinPoint.getTarget().getClass().getSimpleName();
-
-    logger.info("Request URL: {}", httpServletRequest.getRequestURL());
-    logger.info("HTTP Method: {}", httpServletRequest.getMethod());
-    logger.info("Request Params: {}", httpServletRequest.getQueryString());
-    if(logger.isInfoEnabled()){
-      logger.info("Executing {}.{}() with arguments: {}",
-              className,
-              methodName,
-              Arrays.toString(joinPoint.getArgs())
-      );
-    }
+    String methodName = joinPoint.getSignature().getName();
+    String arguments = Arrays.toString(joinPoint.getArgs());
 
     long startTime = System.currentTimeMillis();
-    Object result = joinPoint.proceed();
-    long endTime = System.currentTimeMillis();
+    Object result;
+    try {
+      result = joinPoint.proceed(); // Execute the method
+    } catch (Throwable throwable) {
+      logger.error("Exception during AOP logging", throwable);
+      throw throwable;
+    }
+    long executionTimeMs = System.currentTimeMillis() - startTime;
 
-    logger.info("Completed {}.{}() in {} ms with result: {}", className, methodName, endTime - startTime, result);
+    // Log the details
+    Map<String, Object> logDetails = new HashMap<>();
+    logDetails.put("requestUrl", requestUrl);
+    logDetails.put("httpMethod", httpMethod);
+    logDetails.put("queryParams", queryParams);
+    logDetails.put("className", className);
+    logDetails.put("methodName", methodName);
+    logDetails.put("arguments", arguments);
+    logDetails.put("executionTimeMs", executionTimeMs);
+    logDetails.put("response", result);
+
+    logger.info("Controller Request Log: {}", logDetails);
 
     return result;
   }
