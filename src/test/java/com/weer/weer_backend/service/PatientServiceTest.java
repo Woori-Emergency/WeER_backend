@@ -140,7 +140,7 @@ class PatientServiceTest {
         .ageGroup(AgeGroup.FORTIES)
         .build();
 
-    when(patientConditionRepository.findAllByUserId(userId)).thenReturn(List.of(patientCondition));
+    when(patientConditionRepository.findAllByUserId(userId)).thenReturn(Optional.of(List.of(patientCondition)));
 
     // When
     List<PatientConditionResponseDTO> patientConditionResponseDTOList = patientService.getPatientConditionList(userId);

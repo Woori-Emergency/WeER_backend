@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ERAnnouncementDTO {
     private Long announcementId;   // 공지사항 고유 ID
     private Long hospitalId;       // 병원 고유 ID

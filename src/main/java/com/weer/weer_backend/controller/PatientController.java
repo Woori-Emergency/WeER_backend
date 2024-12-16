@@ -113,7 +113,7 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.<List<PatientConditionResponseDTO>>builder()
                             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message("환자 목록 조회 중 오류가 발생했습니다.")
+                            .message(e.getMessage())
                             .build());
         }
     }

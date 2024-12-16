@@ -17,8 +17,9 @@ import org.springframework.context.annotation.Configuration;
         version = "v1"
     ),
     servers = {
-      @Server(url = "https://www.woorifisa3-weer-server.com", description = "개발 서버"),
-      @Server(url = "http://localhost:8080", description = "로컬 서버")
+        @Server(url = "https://www.weer-server.store", description = "개발 서버"),
+        @Server(url = "https://weer-server.store", description = "개발 서버2"),
+        @Server(url = "http://localhost:8080", description = "로컬 서버")
     }
 )
 @Configuration
