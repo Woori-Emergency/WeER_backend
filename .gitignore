@@ -32,6 +32,9 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+docker-build.sh
 
 ### VS Code ###
 .vscode/
+
+src/main/resources/application-secret.yml

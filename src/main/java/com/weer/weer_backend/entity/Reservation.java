@@ -1,12 +1,11 @@
 package com.weer.weer_backend.entity;
 
+import com.weer.weer_backend.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,23 +14,22 @@ import java.util.Date;
 @Entity
 @Table(name = "RESERVATION")
 public class Reservation extends BaseEntity{
-
     @Id
     @Column(name = "RESERVATION_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
 
     @Column(name = "HOSPITAL_ID")
     private Long hospitalId;
 
-    @Column(name = "USER_ID")
-    private Long userId;
+    @Column(name = "PATIENT_CONDITION_ID")
+    private Long patientconditionid;
 
-    @Column(name = "PATIENT_NAME")
-    private String patientName;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
 
-    @Column(name = "PATIENT_STATUS")
-    private String patientStatus;
-
-    private String status;
-
+    public Reservation changeStatus(ReservationStatus newStatus){
+        this.reservationStatus = newStatus;
+        return this;
+    }
 }

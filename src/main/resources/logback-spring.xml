@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- JSON 로그를 위한 appender 정의 -->
+  <appender name="AOP_JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp>
+          <!-- 타임존 설정 (예: Asia/Seoul) -->
+          <timeZone>Asia/Seoul</timeZone>
+        </timestamp>
+        <logLevel />
+        <loggerName />
+        <threadName />
+        <message />
+        <mdc />
+        <context />
+        <stackTrace />
+      </providers>
+    </encoder>
+  </appender>
+
+  <!-- LoggingAspect 로거를 INFO로 설정하여 해당 Aspect 로그만 INFO 레벨로 JSON 출력 -->
+  <logger name="com.weer.weer_backend.config.LoggingAspect" level="INFO" additivity="false">
+    <appender-ref ref="AOP_JSON_CONSOLE"/>
+  </logger>
+
+  <!-- Root 로거를 ERROR로 두어 다른 로그는 대부분 출력되지 않도록 함 -->
+  <root level="ERROR">
+    <appender-ref ref="AOP_JSON_CONSOLE"/>
+  </root>
+
+</configuration>

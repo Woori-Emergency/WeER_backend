@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,19 +14,29 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "ER_ANNOUNCEMENT")
-public class ERAnnouncement extends BaseEntity{
+public class ERAnnouncement extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ANNOUNCEMENT_ID")
-    private Long announcementId;
+    private Long announcementId;  // 공지사항 고유 ID
 
-    @Column(name = "HOSPITAL_ID")
-    private Long hospitalId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "HOSPITAL_ID")
+    private Hospital hospitalId;  // 병원 고유 ID
 
-    private String title;
+    @Column(name = "MSG_TYPE")
+    private String msgType;  // 메시지 구분
 
-    private String message;
+    @Column(name = "MESSAGE")
+    private String message;  // 공지 메시지 내용
 
-    private String status;
+    @Column(name = "DISEASE_TYPE")
+    private String diseaseType;  // 중증 질환명
 
+    @Column(name = "START_TIME")
+    private LocalDateTime startTime;
+
+    @Column(name = "END_TIME")
+    private LocalDateTime endTime;
 }

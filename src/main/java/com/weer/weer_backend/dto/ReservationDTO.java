@@ -1,19 +1,19 @@
 package com.weer.weer_backend.dto;
 
+import com.weer.weer_backend.enums.ReservationStatus;
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import lombok.ToString;
 
 @Data
+@Builder
+@ToString
 public class ReservationDTO {
     private Long reservationId;
     private Long hospitalId;
-    private Long userId;
-    private String patientName;
-    private String patientStatus;
-    private String status;
-    private Date createdAt;
-    private Date modifiedAt;
-
-    // Getters and Setters
+    private Long patientconditionId;
+    private ReservationStatus reservationStatus;
 }
+

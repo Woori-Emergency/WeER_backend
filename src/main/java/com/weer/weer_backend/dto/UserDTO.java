@@ -1,20 +1,18 @@
 package com.weer.weer_backend.dto;
 
+import lombok.Builder;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.ToString;
 
 @Data
+@Builder
+@ToString
 public class UserDTO {
-    private Long userId;
     private String loginId;
     private String name;
     private String password;
-    private String role;
     private String email;
     private String tel;
-    private Date createdAt;
-    private Date modifiedAt;
-
-    // Getters and Setters
+    private String certificate;
+    private String organization;
 }
